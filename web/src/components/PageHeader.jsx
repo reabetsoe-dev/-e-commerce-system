@@ -39,7 +39,9 @@ export default function PageHeader({
         <Breadcrumbs items={breadcrumbs} />
       </div>
 
-      <section className={`panel page-hero-panel ${className}`.trim()}>
+      <section
+        className={`panel page-hero-panel ${actions ? "page-hero-panel-has-actions" : ""} ${className}`.trim()}
+      >
         <div className="page-hero-copy">
           {eyebrow && <span className="page-hero-kicker">{eyebrow}</span>}
           {title && <h1>{title}</h1>}

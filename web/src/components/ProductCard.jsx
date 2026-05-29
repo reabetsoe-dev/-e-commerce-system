@@ -24,9 +24,11 @@ export default function ProductCard({
   );
   const isService = product.type === "service";
   const isOutOfStock = !isService && product.stock <= 0;
+  const brandOrProvider = product.provider || product.brand;
+  const availability = product.availabilityStatus || (isOutOfStock ? "Out of Stock" : "In Stock");
 
   return (
-    <article className="product-card">
+    <article className="product-card" data-cy="product-card" data-product-id={product.id}>
       <button
         type="button"
         className={`wishlist-btn ${wishlisted ? "active" : ""}`}
@@ -39,7 +41,11 @@ export default function ProductCard({
         <img src={product.imageUrl} alt={product.name} />
       </div>
       <div className="product-content">
-        <h3>{product.name}</h3>
+        <h3 data-cy="product-name">{product.name}</h3>
+        <div className="product-meta">
+          {brandOrProvider && <span>{brandOrProvider}</span>}
+          <span>{availability}</span>
+        </div>
         <strong className="product-price">{formatMoney(discountedPrice)}</strong>
         <div className="product-savings">
           {product.discountPercent > 0 && (
@@ -60,6 +66,7 @@ export default function ProductCard({
           className="product-cart-btn"
           disabled={busy || isOutOfStock}
           onClick={() => onAddToCart(product.id)}
+          data-cy="add-to-cart-button"
         >
           {!busy && !isOutOfStock && <CartIcon />}
           {busy ? "Adding..." : isOutOfStock ? "Out of Stock" : "Add to Cart"}

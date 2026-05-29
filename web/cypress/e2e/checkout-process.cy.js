@@ -32,7 +32,10 @@ describe("Checkout process", () => {
     cy.getBySel("proceed-to-checkout-button").click();
     cy.location("pathname").should("eq", "/checkout");
 
-    cy.getBySel("checkout-payment-method").select("Mobile Money");
+    cy.getBySel("checkout-payment-method").contains("Mpesa").click();
+    cy.getBySel("checkout-lesotho-number").type("+266 5800 0000");
+    cy.getBySel("checkout-payment-total").should("be.visible");
+    cy.getBySel("checkout-payment-amount").should("not.exist");
     cy.getBySel("checkout-continue-button").click();
     cy.getBySel("checkout-place-order-button").click();
 

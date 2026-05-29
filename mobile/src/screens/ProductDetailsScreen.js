@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import PageHeader from "../components/PageHeader";
 import ProductCard from "../components/ProductCard";
-import api, { getApiError } from "../api/client";
+import api, { getApiError, resolveAssetUrl } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { useShop } from "../context/ShopContext";
@@ -100,7 +100,7 @@ export default function ProductDetailsScreen() {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0e7a78" />
+        <ActivityIndicator size="large" color="#0644ca" />
       </View>
     );
   }
@@ -125,7 +125,11 @@ export default function ProductDetailsScreen() {
       {status ? <Text style={styles.status}>{status}</Text> : null}
 
       <View style={styles.card}>
-        <Image source={{ uri: selectedImage || product.imageUrl }} style={styles.mainImage} resizeMode="cover" />
+        <Image
+          source={{ uri: resolveAssetUrl(selectedImage || product.imageUrl) }}
+          style={styles.mainImage}
+          resizeMode="contain"
+        />
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.thumbRow}>
           {(product.gallery?.length ? product.gallery : [product.imageUrl]).map((image) => (
             <Pressable
@@ -133,7 +137,7 @@ export default function ProductDetailsScreen() {
               style={[styles.thumbFrame, selectedImage === image && styles.thumbFrameActive]}
               onPress={() => setSelectedImage(image)}
             >
-              <Image source={{ uri: image }} style={styles.thumbImage} />
+              <Image source={{ uri: resolveAssetUrl(image) }} style={styles.thumbImage} resizeMode="contain" />
             </Pressable>
           ))}
         </ScrollView>
@@ -145,7 +149,8 @@ export default function ProductDetailsScreen() {
           ) : null}
         </View>
         <Text style={styles.meta}>
-          {product.type === "service" ? "Service item" : `Stock: ${product.stock}`} · Rating {product.rating || "4.5"}
+          {(product.provider || product.brand) ? `${product.provider || product.brand} - ` : ""}
+          {product.type === "service" ? "Service item" : `Stock: ${product.stock}`} - Rating {product.rating || "4.5"}
         </Text>
         <View style={styles.actionRow}>
           <Pressable
@@ -202,7 +207,7 @@ export default function ProductDetailsScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#f4f8f7"
+    backgroundColor: "#f4f8fb"
   },
   content: {
     padding: 12,
@@ -213,12 +218,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f4f8f7"
+    backgroundColor: "#f4f8fb"
   },
   card: {
     borderWidth: 1,
-    borderColor: "#d8e5e1",
-    borderRadius: 16,
+    borderColor: "#dce8f1",
+    borderRadius: 20,
     backgroundColor: "#fff",
     padding: 12,
     gap: 10
@@ -226,8 +231,10 @@ const styles = StyleSheet.create({
   mainImage: {
     width: "100%",
     height: 260,
-    borderRadius: 12,
-    backgroundColor: "#eef3f7"
+    borderRadius: 16,
+    backgroundColor: "#f7fbff",
+    borderWidth: 1,
+    borderColor: "#e7eef7"
   },
   thumbRow: {
     gap: 8
@@ -279,7 +286,7 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     flex: 1,
-    backgroundColor: "#0e7a78",
+    backgroundColor: "#0644ca",
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: "center"
@@ -290,12 +297,12 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     flex: 1,
-    backgroundColor: "#f2f8f6",
+    backgroundColor: "#f5f8ff",
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#c8deda"
+    borderColor: "#d8e5ff"
   },
   secondaryButtonText: {
     color: "#173240",

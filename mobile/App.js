@@ -1,4 +1,5 @@
 ﻿import "react-native-gesture-handler";
+import { Ionicons } from "@expo/vector-icons";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -21,14 +22,14 @@ import { ShopProvider, useShop } from "./src/context/ShopContext";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-const ICONS = {
-  Products: "P",
-  Hosting: "H",
-  Wishlist: "W",
-  Cart: "C",
-  Orders: "O",
-  Profile: "U",
-  Admin: "A"
+const TAB_ICONS = {
+  Products: ["storefront", "storefront-outline"],
+  Hosting: ["server", "server-outline"],
+  Wishlist: ["heart", "heart-outline"],
+  Cart: ["cart", "cart-outline"],
+  Orders: ["receipt", "receipt-outline"],
+  Profile: ["person-circle", "person-circle-outline"],
+  Admin: ["shield-checkmark", "shield-checkmark-outline"]
 };
 
 function LoadingScreen() {
@@ -38,11 +39,11 @@ function LoadingScreen() {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#eef5f3"
+        backgroundColor: "#f4f8fb"
       }}
     >
-      <ActivityIndicator size="large" color="#0d7b78" />
-      <Text style={{ marginTop: 12, color: "#174254", fontWeight: "700" }}>Loading...</Text>
+      <ActivityIndicator size="large" color="#0644ca" />
+      <Text style={{ marginTop: 12, color: "#10264a", fontWeight: "900" }}>Loading...</Text>
     </View>
   );
 }
@@ -57,32 +58,53 @@ function AppTabs() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerStyle: {
-          backgroundColor: "#0c3e58"
+          backgroundColor: "#ffffff"
         },
         headerTitleStyle: {
-          fontWeight: "700"
+          color: "#081327",
+          fontWeight: "900"
         },
-        headerTintColor: "#f6fbff",
-        sceneStyle: { backgroundColor: "#f4f8f7" },
-        tabBarActiveTintColor: "#0e7a78",
+        headerTintColor: "#0644ca",
+        headerShadowVisible: false,
+        sceneStyle: { backgroundColor: "#f4f8fb" },
+        tabBarActiveTintColor: "#0644ca",
         tabBarInactiveTintColor: "#6b7f89",
         tabBarStyle: {
           backgroundColor: "#ffffff",
-          borderTopColor: "#d5e2de",
+          borderTopColor: "#dce8f1",
           borderTopWidth: 1,
-          height: 66,
-          paddingBottom: 8,
-          paddingTop: 8
+          height: 72,
+          paddingBottom: 10,
+          paddingTop: 8,
+          shadowColor: "#0b376b",
+          shadowOpacity: 0.12,
+          shadowRadius: 16,
+          shadowOffset: { width: 0, height: -4 },
+          elevation: 12
         },
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: "700"
+          fontWeight: "900"
         },
-        tabBarIcon: ({ color, focused }) => (
-          <Text style={{ fontSize: focused ? 16 : 14, color, fontWeight: "800" }}>
-            {ICONS[route.name]}
-          </Text>
-        )
+        tabBarBadgeStyle: {
+          backgroundColor: "#0644ca",
+          color: "#fff",
+          fontWeight: "900"
+        },
+        tabBarIcon: ({ color, focused }) => {
+          const [activeIcon, inactiveIcon] = TAB_ICONS[route.name] || [
+            "ellipse",
+            "ellipse-outline"
+          ];
+
+          return (
+            <Ionicons
+              name={focused ? activeIcon : inactiveIcon}
+              size={focused ? 24 : 22}
+              color={color}
+            />
+          );
+        }
       })}
     >
       <Tab.Screen name="Products" component={ProductsScreen} />

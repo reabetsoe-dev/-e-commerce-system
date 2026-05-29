@@ -57,7 +57,7 @@ export default function OrdersScreen() {
             {error ? <Text style={styles.error}>{error}</Text> : null}
             {loading ? (
               <View style={styles.loadingInline}>
-                <ActivityIndicator color="#0e7a78" />
+                <ActivityIndicator color="#0644ca" />
                 <Text style={styles.loadingText}>Loading orders...</Text>
               </View>
             ) : null}
@@ -97,7 +97,7 @@ export default function OrdersScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#f4f8f7"
+    backgroundColor: "#f4f8fb"
   },
   content: {
     padding: 12,
@@ -127,8 +127,8 @@ const styles = StyleSheet.create({
   },
   empty: {
     borderWidth: 1,
-    borderColor: "#d9e1df",
-    borderRadius: 16,
+    borderColor: "#dce8f1",
+    borderRadius: 20,
     backgroundColor: "#fff",
     padding: 16
   },
@@ -143,8 +143,8 @@ const styles = StyleSheet.create({
   },
   card: {
     borderWidth: 1,
-    borderColor: "#d8e5e1",
-    borderRadius: 16,
+    borderColor: "#dce8f1",
+    borderRadius: 20,
     backgroundColor: "#fff",
     padding: 13,
     gap: 5

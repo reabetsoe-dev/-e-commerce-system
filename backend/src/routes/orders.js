@@ -107,10 +107,78 @@ function calculateTotals(items, couponCode) {
   };
 }
 
-router.post("/checkout", async (req, res) => {
-  const { paymentMethod, shippingAddress, billingAddress, couponCode } = req.body;
+const PAYMENT_METHODS = ["Mpesa", "Ecocash", "Debit card"];
 
-  if (!paymentMethod) {
+function normalizePaymentMethod(value) {
+  const candidate = String(value || "").trim().toLowerCase();
+  return PAYMENT_METHODS.find((method) => method.toLowerCase() === candidate) || "";
+}
+
+function isMobileMoney(method) {
+  return method === "Mpesa" || method === "Ecocash";
+}
+
+function getLesothoDigits(value) {
+  const digits = String(value || "").replace(/\D/g, "");
+  return digits.startsWith("266") ? digits.slice(3) : digits;
+}
+
+function isValidLesothoNumber(value) {
+  return /^[56]\d{7}$/.test(getLesothoDigits(value));
+}
+
+function normalizePaymentDetails(method, rawDetails = {}, expectedAmount = 0) {
+  const details = rawDetails && typeof rawDetails === "object" ? rawDetails : {};
+
+  if (!PAYMENT_METHODS.includes(method)) {
+    return {
+      error: "Payment method must be one of: Mpesa, Ecocash, Debit card."
+    };
+  }
+
+  if (isMobileMoney(method)) {
+    const lesothoNumber = getLesothoDigits(details.lesothoNumber);
+    const amount = Number(expectedAmount);
+
+    if (!isValidLesothoNumber(lesothoNumber)) {
+      return { error: "A valid Lesotho mobile number is required." };
+    }
+
+    if (!(amount > 0)) {
+      return { error: "Payment amount could not be calculated from the order total." };
+    }
+
+    return {
+      details: {
+        lesothoNumber: `+266${lesothoNumber}`,
+        amount
+      }
+    };
+  }
+
+  const cardNumber = String(details.cardNumber || "").replace(/\D/g, "");
+  const cvc = String(details.cvc || "").trim();
+
+  if (!/^\d{13,19}$/.test(cardNumber)) {
+    return { error: "A valid debit card number is required." };
+  }
+
+  if (!/^\d{3,4}$/.test(cvc)) {
+    return { error: "A valid CVC is required." };
+  }
+
+  return {
+    details: {
+      cardLast4: cardNumber.slice(-4)
+    }
+  };
+}
+
+router.post("/checkout", async (req, res) => {
+  const { paymentMethod, paymentDetails, shippingAddress, billingAddress, couponCode } = req.body;
+
+  const normalizedPaymentMethod = normalizePaymentMethod(paymentMethod);
+  if (!normalizedPaymentMethod) {
     return res.status(400).json({ message: "paymentMethod is required." });
   }
 
@@ -142,6 +210,15 @@ router.post("/checkout", async (req, res) => {
 
   const timestamp = nowIso();
   const totals = calculateTotals(detailedCart.items, couponCode);
+  const normalizedPayment = normalizePaymentDetails(
+    normalizedPaymentMethod,
+    paymentDetails,
+    totals.grandTotal
+  );
+  if (normalizedPayment.error) {
+    return res.status(400).json({ message: normalizedPayment.error });
+  }
+
   const order = {
     id: uuid(),
     orderNumber: generateOrderNumber(),
@@ -163,10 +240,11 @@ router.post("/checkout", async (req, res) => {
       }
     ],
     payment: {
-      method: String(paymentMethod),
+      method: normalizedPaymentMethod,
       transactionRef: `TX-${Date.now()}`,
       simulated: true,
-      amount: totals.grandTotal
+      amount: totals.grandTotal,
+      details: normalizedPayment.details
     },
     shippingAddress: String(shippingAddress || "Not required").trim(),
     billingAddress: String(billingAddress || "").trim(),

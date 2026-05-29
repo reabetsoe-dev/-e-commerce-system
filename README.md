@@ -70,10 +70,17 @@ VITE_API_BASE_URL=http://localhost:4000/api
 ```bash
 cd mobile
 npm install
-npm run start
+npm run android
 ```
 
-For real device testing with Expo, set the API URL in environment:
+The mobile app runs in Expo LAN mode and automatically tries the same LAN host
+used by the Expo dev server. Keep the backend running while you scan the Expo
+QR code or open the Android app.
+
+If your network changes while Expo is open, stop Expo and run `npm run android`
+again so the phone receives the new bundle.
+
+You can still force a specific API URL with:
 
 ```bash
 EXPO_PUBLIC_API_BASE_URL=http://YOUR_LOCAL_IP:4000/api
@@ -86,6 +93,49 @@ EXPO_PUBLIC_API_BASE_URL=http://10.0.2.2:4000/api
 ```
 
 For iOS simulator, `http://localhost:4000/api` usually works.
+
+## 4. Run Cypress E2E (Web)
+
+Cypress is configured in `web/cypress.config.js` to run against the local loopback address:
+
+- Web app: `http://127.0.0.1:5173`
+- API: `http://127.0.0.1:4000/api`
+
+Start backend and web first:
+
+```bash
+cd backend
+npm run dev
+```
+
+```bash
+cd web
+npm run dev
+```
+
+Then run Cypress from `web/`:
+
+```bash
+npm run cy:open
+```
+
+or headless:
+
+```bash
+npm run cy:run
+```
+
+The Cypress npm scripts clear `ELECTRON_RUN_AS_NODE` and use a project-local
+Cypress cache so the test runner starts reliably on Windows.
+
+Implemented E2E specs are in `web/cypress/e2e/`:
+
+- `user-registration.cy.js`
+- `user-login.cy.js`
+- `product-search.cy.js`
+- `add-to-cart.cy.js`
+- `checkout-process.cy.js`
+- `order-tracking.cy.js`
 
 ## Implemented API Endpoints
 

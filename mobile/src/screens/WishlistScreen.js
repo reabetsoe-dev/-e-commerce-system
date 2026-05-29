@@ -87,7 +87,7 @@ export default function WishlistScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#f4f8f7"
+    backgroundColor: "#f4f8fb"
   },
   content: {
     padding: 12,
@@ -105,8 +105,8 @@ const styles = StyleSheet.create({
   },
   empty: {
     borderWidth: 1,
-    borderColor: "#d8e5e1",
-    borderRadius: 16,
+    borderColor: "#dce8f1",
+    borderRadius: 20,
     backgroundColor: "#fff",
     padding: 16
   },

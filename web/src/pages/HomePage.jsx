@@ -29,7 +29,9 @@ export default function HomePage() {
                 {!user && <Link to="/auth">Login / Register</Link>}
                 {user && (
                   <>
-                    <Link to="/profile">Hi, {user.name}</Link>
+                    <Link to="/profile" data-cy="home-user-chip">
+                      Hi, {user.name}
+                    </Link>
                     <button type="button" onClick={logout}>
                       Logout
                     </button>

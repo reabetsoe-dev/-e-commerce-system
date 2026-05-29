@@ -108,7 +108,7 @@ function NavButton({ label, onPress }) {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#f4f8f7"
+    backgroundColor: "#f4f8fb"
   },
   content: {
     padding: 12,
@@ -117,8 +117,8 @@ const styles = StyleSheet.create({
   },
   card: {
     borderWidth: 1,
-    borderColor: "#d7e4e0",
-    borderRadius: 16,
+    borderColor: "#dce8f1",
+    borderRadius: 20,
     backgroundColor: "#fff",
     padding: 14,
     gap: 8
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f5f8f7"
   },
   primaryButton: {
-    backgroundColor: "#0e7a78",
+    backgroundColor: "#0644ca",
     borderRadius: 12,
     alignItems: "center",
     paddingVertical: 12,

@@ -10,6 +10,9 @@ export default function QuickViewModal({ product, onClose, onAddToCart, busy }) 
   );
   const isService = product.type === "service";
   const isOutOfStock = !isService && product.stock <= 0;
+  const brandLabel = isService ? "Provider" : "Brand";
+  const brandOrProvider = product.provider || product.brand;
+  const availability = product.availabilityStatus || (isService ? "Available" : isOutOfStock ? "Out of Stock" : "In Stock");
 
   return (
     <div className="modal-backdrop" role="dialog" aria-modal="true">
@@ -25,6 +28,11 @@ export default function QuickViewModal({ product, onClose, onAddToCart, busy }) 
               {product.subcategory && <span className="tag tag-muted">{product.subcategory}</span>}
             </div>
             <h2>{product.name}</h2>
+            {brandOrProvider && (
+              <p className="muted">
+                {brandLabel}: {brandOrProvider}
+              </p>
+            )}
             <p className="muted">{product.description}</p>
             <p className="price-row">
               {product.discountPercent > 0 && (
@@ -36,7 +44,7 @@ export default function QuickViewModal({ product, onClose, onAddToCart, busy }) 
               Rating: {product.rating} / 5 ({product.reviewsCount} reviews)
             </p>
             <p className={isService ? "muted" : product.stock <= 5 ? "stock-warn" : "muted"}>
-              {isService ? "Service item" : `Stock: ${product.stock}`}
+              {isService ? availability : `${availability} - Stock: ${product.stock}`}
             </p>
             <button
               type="button"

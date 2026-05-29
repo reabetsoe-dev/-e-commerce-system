@@ -41,7 +41,7 @@ export default function OrderDetailsScreen() {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0e7a78" />
+        <ActivityIndicator size="large" color="#0644ca" />
       </View>
     );
   }
@@ -121,7 +121,7 @@ function SummaryLine({ label, value, total }) {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#f4f8f7"
+    backgroundColor: "#f4f8fb"
   },
   content: {
     padding: 12,
@@ -132,12 +132,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f4f8f7"
+    backgroundColor: "#f4f8fb"
   },
   card: {
     borderWidth: 1,
-    borderColor: "#d8e5e1",
-    borderRadius: 16,
+    borderColor: "#dce8f1",
+    borderRadius: 20,
     backgroundColor: "#fff",
     padding: 14,
     gap: 7

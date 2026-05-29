@@ -18,6 +18,10 @@ import {
   getSubcategoriesForCategory
 } from "../data/shopCategories";
 import { formatMoney } from "../utils/currency";
+import {
+  INVALID_NUMERIC_INPUT_MESSAGE,
+  getNumericInputError
+} from "../utils/numericValidation";
 
 const ORDER_STATUSES = ["Pending", "Paid", "Processing", "Shipped", "Delivered", "Cancelled"];
 
@@ -31,6 +35,12 @@ const INITIAL_PRODUCT = {
   stock: "",
   imageUrl: "",
   discountPercent: "0"
+};
+
+const PRODUCT_NUMERIC_FIELDS = {
+  price: "decimal",
+  stock: "digits",
+  discountPercent: "decimal"
 };
 
 export default function AdminScreen() {
@@ -86,12 +96,38 @@ export default function AdminScreen() {
       }));
       return;
     }
+
+    const numericMode = PRODUCT_NUMERIC_FIELDS[field];
+    if (numericMode) {
+      const inputError = getNumericInputError(value, numericMode);
+      if (inputError) {
+        setError(inputError);
+        return;
+      }
+      setError((current) => (current === INVALID_NUMERIC_INPUT_MESSAGE ? "" : current));
+    }
+
     setNewProduct((current) => ({ ...current, [field]: value }));
+  };
+
+  const getProductNumericError = () => {
+    const productNumericError =
+      getNumericInputError(newProduct.price, "decimal") ||
+      getNumericInputError(newProduct.discountPercent, "decimal") ||
+      (newProduct.type === "service" ? "" : getNumericInputError(newProduct.stock, "digits"));
+
+    return productNumericError ? INVALID_NUMERIC_INPUT_MESSAGE : "";
   };
 
   const createProduct = async () => {
     setMessage("");
     setError("");
+    const productNumericError = getProductNumericError();
+    if (productNumericError) {
+      setError(productNumericError);
+      return;
+    }
+
     try {
       await api.post("/products", {
         ...newProduct,
@@ -137,7 +173,7 @@ export default function AdminScreen() {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0e7a78" />
+        <ActivityIndicator size="large" color="#0644ca" />
       </View>
     );
   }
@@ -207,7 +243,7 @@ export default function AdminScreen() {
         {orders.slice(0, 12).map((order) => (
           <View style={styles.listItem} key={order.id}>
             <Text style={styles.itemTitle}>{order.orderNumber || order.id.slice(0, 8)}</Text>
-            <Text style={styles.meta}>{formatMoney(order.total)} · {order.status}</Text>
+            <Text style={styles.meta}>{formatMoney(order.total)} - {order.status}</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
               {ORDER_STATUSES.map((status) => (
                 <Pressable
@@ -229,7 +265,7 @@ export default function AdminScreen() {
         <Text style={styles.sectionTitle}>Products</Text>
         {products.slice(0, 14).map((product) => (
           <Text style={styles.meta} key={product.id}>
-            {product.name} · {formatMoney(product.price)} · {product.type === "service" ? "Service" : `Stock ${product.stock}`}
+            {product.name} - {formatMoney(product.price)} - {product.type === "service" ? "Service" : `Stock ${product.stock}`}
           </Text>
         ))}
       </View>
@@ -239,7 +275,7 @@ export default function AdminScreen() {
         {users.map((user) => (
           <View style={styles.listItem} key={user.id}>
             <Text style={styles.itemTitle}>{user.name}</Text>
-            <Text style={styles.meta}>{user.email} · {user.role}</Text>
+            <Text style={styles.meta}>{user.email} - {user.role}</Text>
             <View style={styles.row}>
               <Pressable style={styles.lightButton} onPress={() => updateUserRole(user.id, "customer")}>
                 <Text style={styles.lightButtonText}>Customer</Text>
@@ -267,7 +303,7 @@ function SummaryCard({ label, value }) {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#f4f8f7"
+    backgroundColor: "#f4f8fb"
   },
   content: {
     padding: 12,
@@ -278,7 +314,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f4f8f7"
+    backgroundColor: "#f4f8fb"
   },
   summaryGrid: {
     flexDirection: "row",
@@ -289,8 +325,8 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     flexBasis: "47%",
     borderWidth: 1,
-    borderColor: "#d8e5e1",
-    borderRadius: 14,
+    borderColor: "#dce8f1",
+    borderRadius: 16,
     backgroundColor: "#fff",
     padding: 12
   },
@@ -306,8 +342,8 @@ const styles = StyleSheet.create({
   },
   card: {
     borderWidth: 1,
-    borderColor: "#d8e5e1",
-    borderRadius: 16,
+    borderColor: "#dce8f1",
+    borderRadius: 20,
     backgroundColor: "#fff",
     padding: 14,
     gap: 9
@@ -364,7 +400,7 @@ const styles = StyleSheet.create({
     color: "#0644ca"
   },
   primaryButton: {
-    backgroundColor: "#0e7a78",
+    backgroundColor: "#0644ca",
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: "center"

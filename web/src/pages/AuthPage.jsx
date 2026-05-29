@@ -130,7 +130,7 @@ export default function AuthPage() {
   };
 
   return (
-    <section className="auth-layout auth-screen">
+    <section className="auth-layout auth-screen" data-cy="auth-page">
       <button
         type="button"
         className="auth-back-button"
@@ -152,6 +152,7 @@ export default function AuthPage() {
             type="button"
             className={mode === "login" ? "active" : ""}
             onClick={() => setMode("login")}
+            data-cy="auth-tab-login"
           >
             Login
           </button>
@@ -159,12 +160,13 @@ export default function AuthPage() {
             type="button"
             className={mode === "register" ? "active" : ""}
             onClick={() => setMode("register")}
+            data-cy="auth-tab-register"
           >
             Register
           </button>
         </div>
 
-        <form className="auth-form" onSubmit={onSubmit}>
+        <form className="auth-form" onSubmit={onSubmit} data-cy="auth-form">
           {mode === "register" && (
             <label className="auth-field">
               <span className="sr-only">Full Name</span>
@@ -178,6 +180,7 @@ export default function AuthPage() {
                 onChange={onChange}
                 required
                 placeholder="Full Name"
+                data-cy="register-name-input"
               />
             </label>
           )}
@@ -193,6 +196,7 @@ export default function AuthPage() {
               onChange={onChange}
               required
               placeholder="Email ID"
+              data-cy="auth-email-input"
             />
           </label>
           <label className="auth-field">
@@ -208,6 +212,7 @@ export default function AuthPage() {
               required
               minLength={8}
               placeholder="Password"
+              data-cy="auth-password-input"
             />
             <button
               type="button"
@@ -234,6 +239,7 @@ export default function AuthPage() {
                 required
                 minLength={8}
                 placeholder="Confirm Password"
+                data-cy="register-confirm-password-input"
               />
             </label>
           )}
@@ -248,8 +254,17 @@ export default function AuthPage() {
             </div>
           )}
 
-          {error && <p className="error notice">{error}</p>}
-          <button type="submit" className="auth-submit" disabled={busy}>
+          {error && (
+            <p className="error notice" data-cy="auth-error">
+              {error}
+            </p>
+          )}
+          <button
+            type="submit"
+            className="auth-submit"
+            disabled={busy}
+            data-cy="auth-submit-button"
+          >
             {busy ? "Please wait..." : mode === "login" ? "Login" : "Create Account"}
           </button>
         </form>

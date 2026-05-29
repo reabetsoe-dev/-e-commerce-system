@@ -4,8 +4,7 @@ export const PRODUCT_CATEGORIES = [
     category: "Computers",
     defaultType: "physical",
     subcategories: ["Laptops", "Desktops", "Components", "Monitors", "Computer Bundles"],
-    imageUrl:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=80",
+    imageUrl: "/images/laptop.jpg",
     imageAlt: "Laptop computer on a desk",
     description: "Laptops, desktops, components, monitors, and complete computer bundles."
   },
@@ -43,9 +42,8 @@ export const PRODUCT_CATEGORIES = [
       "Developer Services",
       "Ecommerce Services"
     ],
-    imageUrl:
-      "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80",
-    imageAlt: "Server racks for web hosting services",
+    imageUrl: "/images/web-hosting-services.png",
+    imageAlt: "Web hosting services data center with cloud hosting features",
     description: "Hosting, domains, websites, email, servers, security, cloud, developer, and store services."
   }
 ];

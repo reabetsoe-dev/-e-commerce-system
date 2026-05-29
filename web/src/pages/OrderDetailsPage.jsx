@@ -69,8 +69,10 @@ export default function OrderDetailsPage() {
         fallback="/orders"
       />
 
-      <section className="panel">
-        <span className="status-chip">{order.status}</span>
+      <section className="panel" data-cy="order-details-status-panel">
+        <span className="status-chip" data-cy="order-details-status">
+          {order.status}
+        </span>
       </section>
 
       <section className="panel invoice-layout">
@@ -125,11 +127,11 @@ export default function OrderDetailsPage() {
         </ul>
       </section>
 
-      <section className="panel">
+      <section className="panel" data-cy="order-status-timeline">
         <h2>Status Timeline</h2>
         <ul className="status-timeline">
           {order.statusHistory.map((entry, index) => (
-            <li key={`${entry.timestamp}-${index}`}>
+            <li key={`${entry.timestamp}-${index}`} data-cy="order-timeline-item">
               <span>{formatDate(entry.timestamp)}</span>
               <strong>{entry.status}</strong>
               <p>{entry.note}</p>

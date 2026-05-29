@@ -9,6 +9,10 @@ import {
   getSubcategoriesForCategory
 } from "../data/shopCategories";
 import { formatMoney } from "../utils/currency";
+import {
+  INVALID_NUMERIC_INPUT_MESSAGE,
+  getNumericInputError
+} from "../utils/numericValidation";
 
 function formatDate(value) {
   return new Date(value).toLocaleString();
@@ -169,10 +173,36 @@ export default function AdminPage() {
     });
   }, [orders, orderSearch, orderStatusFilter]);
 
+  const setNumericProductField = (field, value, mode = "digits") => {
+    const inputError = getNumericInputError(value, mode);
+    if (inputError) {
+      setError(inputError);
+      return;
+    }
+
+    setError((current) => (current === INVALID_NUMERIC_INPUT_MESSAGE ? "" : current));
+    setNewProduct((current) => ({ ...current, [field]: value }));
+  };
+
+  const getProductFormNumericError = () => {
+    const productNumericError =
+      getNumericInputError(newProduct.price, "decimal") ||
+      getNumericInputError(newProduct.discountPercent, "decimal") ||
+      (newProduct.type === "service" ? "" : getNumericInputError(newProduct.stock, "digits"));
+
+    return productNumericError ? INVALID_NUMERIC_INPUT_MESSAGE : "";
+  };
+
   const onCreateProduct = async (event) => {
     event.preventDefault();
     setMessage("");
     setError("");
+    const productNumericError = getProductFormNumericError();
+    if (productNumericError) {
+      setError(productNumericError);
+      return;
+    }
+
     try {
       let uploadedImageUrls = [];
       if (selectedImages.length) {
@@ -489,25 +519,23 @@ export default function AdminPage() {
                 <label>
                   Price
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
                     min="0"
                     step="0.01"
                     value={newProduct.price}
-                    onChange={(event) =>
-                      setNewProduct((current) => ({ ...current, price: event.target.value }))
-                    }
+                    onChange={(event) => setNumericProductField("price", event.target.value, "decimal")}
                     required
                   />
                 </label>
                 <label>
                   Stock
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     min="0"
                     value={newProduct.stock}
-                    onChange={(event) =>
-                      setNewProduct((current) => ({ ...current, stock: event.target.value }))
-                    }
+                    onChange={(event) => setNumericProductField("stock", event.target.value, "digits")}
                     required={newProduct.type !== "service"}
                     disabled={newProduct.type === "service"}
                     placeholder={
@@ -518,12 +546,13 @@ export default function AdminPage() {
                 <label>
                   Discount %
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
                     min="0"
                     max="90"
                     value={newProduct.discountPercent}
                     onChange={(event) =>
-                      setNewProduct((current) => ({ ...current, discountPercent: event.target.value }))
+                      setNumericProductField("discountPercent", event.target.value, "decimal")
                     }
                   />
                 </label>

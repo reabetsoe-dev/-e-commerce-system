@@ -19,8 +19,8 @@ export default function CheckoutSuccessPage() {
         subtitle="Your order has been placed successfully. Tracking updates are now available in your orders dashboard."
         fallback="/orders"
       />
-      <section className="panel success-panel">
-        <div className="invoice-card">
+      <section className="panel success-panel" data-cy="checkout-success-page">
+        <div className="invoice-card" data-cy="checkout-success-invoice">
           <p>
             <strong>Order ID:</strong> {order?.id || orderId}
           </p>
@@ -35,7 +35,11 @@ export default function CheckoutSuccessPage() {
           </p>
         </div>
         <div className="hero-cta-row">
-          <Link className="btn btn-primary" to={`/orders/${order?.id || orderId}`}>
+          <Link
+            className="btn btn-primary"
+            to={`/orders/${order?.id || orderId}`}
+            data-cy="view-order-details-button"
+          >
             View Order Details
           </Link>
           <Link className="btn btn-light" to="/catalog">

@@ -7,6 +7,8 @@ const { DATABASE_URL, PG_SSL } = require("../config");
 const {
   CATALOG_VERSION,
   buildDemoProducts,
+  deriveAvailabilityStatus,
+  getLocalProductImage,
   normalizeProductTaxonomy
 } = require("./catalog");
 
@@ -112,10 +114,19 @@ function normalizeProduct(product) {
   normalized.category = taxonomy.category;
   normalized.subcategory = taxonomy.subcategory;
   normalized.type = taxonomy.type;
+  normalized.brand = String(normalized.brand || normalized.provider || "").trim();
+  normalized.provider = String(normalized.provider || normalized.brand || "").trim();
+  normalized.imageUrl = getLocalProductImage(normalized);
+  normalized.gallery = [normalized.imageUrl];
   normalized.stock =
     normalized.type === "service"
       ? 0
       : Math.max(0, Math.trunc(Number(normalized.stock) || 0));
+  normalized.availabilityStatus = deriveAvailabilityStatus(
+    normalized.type,
+    normalized.stock,
+    normalized.availabilityStatus || normalized.availability_status
+  );
   normalized.rating = Number(normalized.rating || 4.5);
   normalized.reviewsCount = Number(normalized.reviewsCount || normalized.reviews_count || 0);
   normalized.popularity = Number(normalized.popularity || 50);
@@ -127,30 +138,17 @@ function normalizeProduct(product) {
   normalized.specifications = Array.isArray(normalized.specifications)
     ? normalized.specifications
     : [];
-  normalized.gallery = Array.isArray(normalized.gallery)
-    ? normalized.gallery
-    : normalized.imageUrl
-    ? [normalized.imageUrl]
-    : [];
   normalized.updatedAt = normalized.updatedAt || normalized.updated_at || normalized.createdAt || nowIso();
   normalized.createdAt = normalized.createdAt || normalized.created_at || normalized.updatedAt;
   return normalized;
 }
 
 function migrateCatalogProducts(db) {
-  db.products = db.products.map(normalizeProduct);
-
-  const existingSubcategories = new Set(
-    db.products.map((product) => `${product.category}::${product.subcategory}`)
-  );
   const timestamp = nowIso();
-  buildDemoProducts(timestamp, uuid).forEach((product) => {
-    const key = `${product.category}::${product.subcategory}`;
-    if (!existingSubcategories.has(key)) {
-      db.products.push(product);
-      existingSubcategories.add(key);
-    }
-  });
+  db.products = buildDemoProducts(timestamp, uuid);
+  db.carts = db.carts.map((cart) => ({ ...cart, items: [] }));
+  db.wishlists = db.wishlists.map((wishlist) => ({ ...wishlist, productIds: [] }));
+  db.recentViews = db.recentViews.map((recentView) => ({ ...recentView, productIds: [] }));
 
   db.catalogVersion = CATALOG_VERSION;
   return db;
@@ -164,7 +162,7 @@ function normalizeDb(db) {
     }
   });
 
-  normalized.catalogVersion = Number(normalized.catalogVersion || CATALOG_VERSION);
+  normalized.catalogVersion = Number(normalized.catalogVersion ?? 0);
   normalized.users = normalized.users.map((user) => ({
     ...user,
     updatedAt: user.updatedAt || user.updated_at || user.createdAt || nowIso(),
@@ -228,8 +226,11 @@ async function createSchema(client) {
       category TEXT NOT NULL,
       type TEXT NOT NULL CHECK (type IN ('physical', 'service')),
       subcategory TEXT NOT NULL,
+      brand TEXT NOT NULL DEFAULT '',
+      provider TEXT NOT NULL DEFAULT '',
       price NUMERIC(12, 2) NOT NULL,
       stock INTEGER NOT NULL DEFAULT 0,
+      availability_status TEXT NOT NULL DEFAULT '',
       image_url TEXT NOT NULL DEFAULT '',
       gallery JSONB NOT NULL DEFAULT '[]'::jsonb,
       rating NUMERIC(3, 1) NOT NULL DEFAULT 4.5,
@@ -310,6 +311,12 @@ async function createSchema(client) {
     CREATE INDEX IF NOT EXISTS idx_orders_user_id ON orders(user_id);
     CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
   `);
+
+  await client.query(`
+    ALTER TABLE products ADD COLUMN IF NOT EXISTS brand TEXT NOT NULL DEFAULT '';
+    ALTER TABLE products ADD COLUMN IF NOT EXISTS provider TEXT NOT NULL DEFAULT '';
+    ALTER TABLE products ADD COLUMN IF NOT EXISTS availability_status TEXT NOT NULL DEFAULT '';
+  `);
 }
 
 async function replaceDb(client, sourceDb) {
@@ -355,13 +362,14 @@ async function replaceDb(client, sourceDb) {
       await client.query(
         `INSERT INTO products
           (
-            id, name, description, category, type, subcategory, price, stock, image_url,
-            gallery, rating, reviews_count, popularity, discount_percent, is_featured,
+            id, name, description, category, type, subcategory, brand, provider, price,
+            stock, availability_status, image_url, gallery, rating, reviews_count, popularity,
+            discount_percent, is_featured,
             badges, specifications, created_at, updated_at
           )
          VALUES
-          ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11, $12, $13, $14, $15,
-           $16::jsonb, $17::jsonb, $18, $19)`,
+          ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13::jsonb, $14, $15,
+           $16, $17, $18, $19::jsonb, $20::jsonb, $21, $22)`,
         [
           product.id,
           product.name,
@@ -369,8 +377,11 @@ async function replaceDb(client, sourceDb) {
           product.category,
           product.type,
           product.subcategory,
+          product.brand,
+          product.provider,
           product.price,
           product.stock,
+          product.availabilityStatus,
           product.imageUrl,
           JSON.stringify(product.gallery || []),
           product.rating,
@@ -565,8 +576,11 @@ async function readPostgresDb() {
         category: row.category,
         type: row.type,
         subcategory: row.subcategory,
+        brand: row.brand,
+        provider: row.provider,
         price: Number(row.price),
         stock: Number(row.stock),
+        availabilityStatus: row.availability_status,
         imageUrl: row.image_url,
         gallery: row.gallery,
         rating: Number(row.rating),
@@ -652,7 +666,7 @@ async function readPostgresDb() {
     }));
 
     return normalizeDb({
-      catalogVersion: Number(metaResult.rows[0]?.value || CATALOG_VERSION),
+      catalogVersion: Number(metaResult.rows[0]?.value ?? 0),
       users,
       products,
       carts: Array.from(cartMap.values()),
@@ -741,12 +755,15 @@ function calculateCartTotals(cartItems, products) {
         name: product.name,
         category: product.category,
         subcategory: product.subcategory,
+        brand: product.brand,
+        provider: product.provider,
         type: product.type,
         listPrice,
         price: unitPrice,
         discountPercent,
         quantity: item.quantity,
         stock: product.stock,
+        availabilityStatus: product.availabilityStatus,
         imageUrl: product.imageUrl,
         subtotal
       };

@@ -3,13 +3,14 @@ import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   Pressable,
   StyleSheet,
   Text,
   View
 } from "react-native";
 import PageHeader from "../components/PageHeader";
-import api, { getApiError } from "../api/client";
+import api, { getApiError, resolveAssetUrl } from "../api/client";
 import { useCart } from "../context/CartContext";
 import { formatMoney } from "../utils/currency";
 
@@ -71,7 +72,7 @@ export default function HostingPlansScreen() {
             {status ? <Text style={styles.status}>{status}</Text> : null}
             {loading ? (
               <View style={styles.loadingInline}>
-                <ActivityIndicator color="#0e7a78" />
+                <ActivityIndicator color="#0644ca" />
                 <Text style={styles.loadingText}>Loading hosting plans...</Text>
               </View>
             ) : null}
@@ -83,6 +84,13 @@ export default function HostingPlansScreen() {
           );
           return (
             <View style={styles.card}>
+              {item.imageUrl ? (
+                <Image
+                  source={{ uri: resolveAssetUrl(item.imageUrl) }}
+                  style={styles.planImage}
+                  resizeMode="contain"
+                />
+              ) : null}
               <Text style={styles.tag}>{item.subcategory}</Text>
               <Text style={styles.title}>{item.name}</Text>
               <Text style={styles.description}>{item.description}</Text>
@@ -123,7 +131,7 @@ export default function HostingPlansScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#f4f8f7"
+    backgroundColor: "#f4f8fb"
   },
   content: {
     padding: 12,
@@ -144,11 +152,24 @@ const styles = StyleSheet.create({
   },
   card: {
     borderWidth: 1,
-    borderColor: "#d8e5e1",
-    borderRadius: 16,
+    borderColor: "#dce8f1",
+    borderRadius: 20,
     backgroundColor: "#fff",
     padding: 14,
-    gap: 8
+    gap: 8,
+    shadowColor: "#0b376b",
+    shadowOpacity: 0.07,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 2
+  },
+  planImage: {
+    width: "100%",
+    height: 170,
+    borderRadius: 16,
+    backgroundColor: "#f7fbff",
+    borderWidth: 1,
+    borderColor: "#e7eef7"
   },
   tag: {
     alignSelf: "flex-start",
@@ -194,7 +215,7 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     flex: 1,
-    backgroundColor: "#0e7a78",
+    backgroundColor: "#0644ca",
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: "center"
@@ -206,8 +227,8 @@ const styles = StyleSheet.create({
   lightButton: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#c8deda",
-    backgroundColor: "#f2f8f6",
+    borderColor: "#d8e5ff",
+    backgroundColor: "#f5f8ff",
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: "center"

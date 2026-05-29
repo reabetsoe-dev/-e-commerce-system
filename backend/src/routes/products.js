@@ -4,8 +4,10 @@ const { adminOnly, authRequired } = require("../middleware/auth");
 const { nowIso, readDb, writeDb, getOrCreateRecentView } = require("../data/store");
 const {
   CATEGORY_TREE,
+  deriveAvailabilityStatus,
   getCategory,
   getCategoryNames,
+  getLocalProductImage,
   getSubcategories,
   isValidCategory,
   isValidSubcategory
@@ -30,16 +32,8 @@ function normalizeSpecs(value) {
   return [];
 }
 
-function normalizeGallery(imageUrl, gallery) {
-  const list = Array.isArray(gallery)
-    ? gallery.map((entry) => String(entry || "").trim()).filter(Boolean)
-    : [];
-
-  if (!list.length && imageUrl) {
-    return [String(imageUrl).trim()];
-  }
-
-  return list;
+function normalizeGallery(imageUrl) {
+  return [String(imageUrl).trim()];
 }
 
 router.get("/meta/categories", async (req, res) => {
@@ -89,7 +83,10 @@ router.get("/", async (req, res) => {
         product.category,
         product.subcategory,
         product.type,
-        ...(product.badges || [])
+        product.brand,
+        product.provider,
+        ...(product.badges || []),
+        ...(product.specifications || []).map((spec) => `${spec.label} ${spec.value}`)
       ]
         .join(" ")
         .toLowerCase();
@@ -200,12 +197,13 @@ router.post("/", authRequired, adminOnly, async (req, res) => {
     name,
     description,
     category,
+    brand,
+    provider,
     type,
     subcategory,
     price,
     stock,
-    imageUrl,
-    gallery,
+    availabilityStatus,
     rating,
     reviewsCount,
     popularity,
@@ -218,6 +216,8 @@ router.post("/", authRequired, adminOnly, async (req, res) => {
   const finalName = String(name || "").trim();
   const finalCategory = String(category || "").trim();
   const finalSubcategory = String(subcategory || "").trim();
+  const finalBrand = String(brand || provider || "").trim();
+  const finalProvider = String(provider || brand || "").trim();
   const productType =
     type === "service" || getCategory(finalCategory)?.defaultType === "service"
       ? "service"
@@ -257,21 +257,37 @@ router.post("/", authRequired, adminOnly, async (req, res) => {
   }
 
   const timestamp = nowIso();
-  const finalImage =
-    String(imageUrl || "").trim() ||
-    "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80";
+  const finalDescription = String(description || "").trim();
+  const finalAvailabilityStatus = deriveAvailabilityStatus(
+    productType,
+    productType === "service" ? 0 : Math.max(0, Math.trunc(parsedStock)),
+    availabilityStatus
+  );
+  const finalImage = getLocalProductImage({
+    name: finalName,
+    description: finalDescription,
+    category: finalCategory,
+    subcategory: finalSubcategory,
+    type: productType,
+    brand: finalBrand,
+    provider: finalProvider,
+    badges
+  });
 
   const product = {
     id: uuid(),
     name: finalName,
-    description: String(description || "").trim(),
+    description: finalDescription,
     category: finalCategory,
+    brand: finalBrand,
+    provider: finalProvider,
     type: productType,
     subcategory: finalSubcategory,
     price: Number(parsedPrice.toFixed(2)),
     stock: productType === "service" ? 0 : Math.max(0, Math.trunc(parsedStock)),
+    availabilityStatus: finalAvailabilityStatus,
     imageUrl: finalImage,
-    gallery: normalizeGallery(finalImage, gallery),
+    gallery: normalizeGallery(finalImage),
     rating: Number(toNumber(rating, 4.5).toFixed(1)),
     reviewsCount: Math.max(0, Math.trunc(toNumber(reviewsCount, 0))),
     popularity: Math.max(0, Math.trunc(toNumber(popularity, 50))),
@@ -336,6 +352,12 @@ router.put("/:id", authRequired, adminOnly, async (req, res) => {
   if (updates.description !== undefined) {
     product.description = String(updates.description).trim();
   }
+  if (updates.brand !== undefined) {
+    product.brand = String(updates.brand).trim();
+  }
+  if (updates.provider !== undefined) {
+    product.provider = String(updates.provider).trim();
+  }
   if (updates.category !== undefined) {
     product.category = nextCategory;
   }
@@ -373,12 +395,16 @@ router.put("/:id", authRequired, adminOnly, async (req, res) => {
   if (nextType === "service") {
     product.stock = 0;
   }
-  if (updates.imageUrl !== undefined) {
-    product.imageUrl = String(updates.imageUrl).trim();
+  if (updates.availabilityStatus !== undefined) {
+    product.availabilityStatus = String(updates.availabilityStatus).trim();
   }
-  if (updates.gallery !== undefined) {
-    product.gallery = normalizeGallery(product.imageUrl, updates.gallery);
-  }
+  product.availabilityStatus = deriveAvailabilityStatus(
+    product.type,
+    product.stock,
+    updates.availabilityStatus !== undefined ? product.availabilityStatus : ""
+  );
+  product.imageUrl = getLocalProductImage(product);
+  product.gallery = normalizeGallery(product.imageUrl);
   if (updates.rating !== undefined) {
     product.rating = Number(toNumber(updates.rating, product.rating).toFixed(1));
   }

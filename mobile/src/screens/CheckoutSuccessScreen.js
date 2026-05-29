@@ -49,7 +49,7 @@ export default function CheckoutSuccessScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#f4f8f7"
+    backgroundColor: "#f4f8fb"
   },
   content: {
     padding: 12,
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     gap: 8
   },
   primaryButton: {
-    backgroundColor: "#0e7a78",
+    backgroundColor: "#0644ca",
     borderRadius: 12,
     paddingVertical: 13,
     alignItems: "center"

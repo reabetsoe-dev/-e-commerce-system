@@ -7,14 +7,63 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View
 } from "react-native";
 import PageHeader from "../components/PageHeader";
-import api, { getApiError } from "../api/client";
+import api, { getApiError, resolveAssetUrl } from "../api/client";
 import { useCart } from "../context/CartContext";
 import { formatMoney } from "../utils/currency";
+import {
+  INVALID_NUMERIC_INPUT_MESSAGE,
+  getNumericInputError
+} from "../utils/numericValidation";
 
-const PAYMENT_METHODS = ["Card", "Mobile Money", "Bank Transfer"];
+const PAYMENT_METHODS = [
+  {
+    value: "Mpesa",
+    label: "Mpesa",
+    icon: require("../../assets/payments/mpesa.png")
+  },
+  {
+    value: "Ecocash",
+    label: "Ecocash",
+    icon: require("../../assets/payments/ecocash.png")
+  },
+  {
+    value: "Debit card",
+    label: "Debit card",
+    icon: require("../../assets/payments/debit-card.png")
+  }
+];
+
+const PAYMENT_NUMERIC_FIELDS = {
+  lesothoNumber: "phone",
+  cardNumber: "card",
+  cvc: "digits"
+};
+
+function isMobileMoney(method) {
+  return method === "Mpesa" || method === "Ecocash";
+}
+
+function getLesothoDigits(value) {
+  const digits = String(value || "").replace(/\D/g, "");
+  return digits.startsWith("266") ? digits.slice(3) : digits;
+}
+
+function isValidLesothoNumber(value) {
+  return /^[56]\d{7}$/.test(getLesothoDigits(value));
+}
+
+function isValidCardNumber(value) {
+  const digits = String(value || "").replace(/\D/g, "");
+  return /^\d{13,19}$/.test(digits);
+}
+
+function isValidCvc(value) {
+  return /^\d{3,4}$/.test(String(value || "").trim());
+}
 
 export default function CartScreen() {
   const navigation = useNavigation();
@@ -23,7 +72,14 @@ export default function CartScreen() {
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [busyId, setBusyId] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("Card");
+  const [paymentMethod, setPaymentMethod] = useState("Mpesa");
+  const [paymentDetails, setPaymentDetails] = useState({
+    lesothoNumber: "",
+    cardNumber: "",
+    cvc: ""
+  });
+  const totals = cart.summary || {};
+  const grandTotal = Number(totals.grandTotal ?? cart.total ?? 0);
 
   useFocusEffect(
     useCallback(() => {
@@ -62,12 +118,19 @@ export default function CartScreen() {
   };
 
   const checkout = async () => {
+    const paymentError = validatePayment();
+    if (paymentError) {
+      setError(paymentError);
+      return;
+    }
+
     setProcessing(true);
     setStatus("");
     setError("");
     try {
       const { data } = await api.post("/checkout", {
         paymentMethod,
+        paymentDetails: getPaymentDetails(),
         shippingAddress: "Not required"
       });
       await refreshCart();
@@ -79,15 +142,73 @@ export default function CartScreen() {
     }
   };
 
+  const updatePaymentDetail = (field, value) => {
+    const numericMode = PAYMENT_NUMERIC_FIELDS[field];
+    if (numericMode) {
+      const inputError = getNumericInputError(value, numericMode);
+      if (inputError) {
+        setError(inputError);
+        return;
+      }
+      setError((current) => (current === INVALID_NUMERIC_INPUT_MESSAGE ? "" : current));
+    }
+
+    setPaymentDetails((current) => ({ ...current, [field]: value }));
+  };
+
+  const validatePayment = () => {
+    if (isMobileMoney(paymentMethod)) {
+      const mobileMoneyInputError = getNumericInputError(paymentDetails.lesothoNumber, "phone");
+      if (mobileMoneyInputError) {
+        return INVALID_NUMERIC_INPUT_MESSAGE;
+      }
+
+      if (!isValidLesothoNumber(paymentDetails.lesothoNumber)) {
+        return "Enter a valid Lesotho mobile number, for example +266 5xxx xxxx.";
+      }
+    }
+
+    if (paymentMethod === "Debit card") {
+      const cardInputError =
+        getNumericInputError(paymentDetails.cardNumber, "card") ||
+        getNumericInputError(paymentDetails.cvc, "digits");
+      if (cardInputError) {
+        return INVALID_NUMERIC_INPUT_MESSAGE;
+      }
+
+      if (!isValidCardNumber(paymentDetails.cardNumber)) {
+        return "Enter a valid debit card number.";
+      }
+
+      if (!isValidCvc(paymentDetails.cvc)) {
+        return "Enter a valid CVC.";
+      }
+    }
+
+    return "";
+  };
+
+  const getPaymentDetails = () => {
+    if (isMobileMoney(paymentMethod)) {
+      return {
+        lesothoNumber: getLesothoDigits(paymentDetails.lesothoNumber),
+        amount: grandTotal
+      };
+    }
+
+    return {
+      cardNumber: String(paymentDetails.cardNumber || "").replace(/\D/g, ""),
+      cvc: String(paymentDetails.cvc || "").trim()
+    };
+  };
+
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0d7b78" />
+        <ActivityIndicator size="large" color="#0644ca" />
       </View>
     );
   }
-
-  const totals = cart.summary || {};
 
   return (
     <ScrollView style={styles.page} contentContainerStyle={styles.content}>
@@ -110,7 +231,13 @@ export default function CartScreen() {
             <Text style={styles.sectionTitle}>Cart Items</Text>
             {cart.items.map((item) => (
               <View key={item.productId} style={styles.itemCard}>
-                {item.imageUrl ? <Image source={{ uri: item.imageUrl }} style={styles.itemImage} /> : null}
+                {item.imageUrl ? (
+                  <Image
+                    source={{ uri: resolveAssetUrl(item.imageUrl) }}
+                    style={styles.itemImage}
+                    resizeMode="contain"
+                  />
+                ) : null}
                 <View style={styles.itemInfo}>
                   <Text style={styles.itemTitle}>{item.name}</Text>
                   <Text style={styles.itemMeta}>{item.category}</Text>
@@ -152,27 +279,73 @@ export default function CartScreen() {
             <SummaryLine label="Subtotal" value={formatMoney(totals.subtotal || cart.total)} />
             <SummaryLine label="Tax" value={formatMoney(totals.tax || 0)} />
             <SummaryLine label="Delivery" value={formatMoney(totals.deliveryFee || 0)} />
-            <SummaryLine label="Grand Total" value={formatMoney(totals.grandTotal || cart.total)} total />
+            <SummaryLine label="Grand Total" value={formatMoney(grandTotal)} total />
 
             <Text style={styles.label}>Payment Method</Text>
             <View style={styles.paymentRow}>
               {PAYMENT_METHODS.map((method) => (
                 <Pressable
-                  key={method}
-                  style={[styles.paymentChip, paymentMethod === method && styles.paymentChipActive]}
-                  onPress={() => setPaymentMethod(method)}
+                  key={method.value}
+                  style={[
+                    styles.paymentCard,
+                    paymentMethod === method.value && styles.paymentCardActive
+                  ]}
+                  onPress={() => {
+                    setError("");
+                    setPaymentMethod(method.value);
+                  }}
                 >
+                  <Image source={method.icon} style={styles.paymentIcon} resizeMode="contain" />
                   <Text
                     style={[
                       styles.paymentChipText,
-                      paymentMethod === method && styles.paymentChipTextActive
+                      paymentMethod === method.value && styles.paymentChipTextActive
                     ]}
                   >
-                    {method}
+                    {method.label}
                   </Text>
                 </Pressable>
               ))}
             </View>
+
+            {isMobileMoney(paymentMethod) ? (
+              <View style={styles.paymentFields}>
+                <TextInput
+                  style={styles.paymentInput}
+                  placeholder="+266 5xxx xxxx"
+                  placeholderTextColor="#7b90a0"
+                  keyboardType="phone-pad"
+                  value={paymentDetails.lesothoNumber}
+                  onChangeText={(value) => updatePaymentDetail("lesothoNumber", value)}
+                />
+                <View style={styles.paymentTotalBox}>
+                  <Text style={styles.paymentTotalLabel}>Amount</Text>
+                  <Text style={styles.paymentTotalValue}>
+                    {formatMoney(grandTotal)}
+                  </Text>
+                </View>
+              </View>
+            ) : (
+              <View style={styles.paymentFields}>
+                <TextInput
+                  style={styles.paymentInput}
+                  placeholder="Card number"
+                  placeholderTextColor="#7b90a0"
+                  keyboardType="number-pad"
+                  value={paymentDetails.cardNumber}
+                  onChangeText={(value) => updatePaymentDetail("cardNumber", value)}
+                />
+                <TextInput
+                  style={styles.paymentInput}
+                  placeholder="CVC"
+                  placeholderTextColor="#7b90a0"
+                  keyboardType="number-pad"
+                  maxLength={4}
+                  value={paymentDetails.cvc}
+                  onChangeText={(value) => updatePaymentDetail("cvc", value)}
+                />
+              </View>
+            )}
 
             <Pressable
               style={[styles.checkoutBtn, processing && styles.disabledBtn]}
@@ -202,7 +375,7 @@ function SummaryLine({ label, value, total }) {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#f4f8f7"
+    backgroundColor: "#f4f8fb"
   },
   content: {
     padding: 12,
@@ -213,7 +386,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f4f8f7"
+    backgroundColor: "#f4f8fb"
   },
   error: {
     color: "#b2353b",
@@ -235,8 +408,8 @@ const styles = StyleSheet.create({
   },
   emptyBox: {
     borderWidth: 1,
-    borderColor: "#d9e4e0",
-    borderRadius: 16,
+    borderColor: "#dce8f1",
+    borderRadius: 20,
     backgroundColor: "#fff",
     padding: 16
   },
@@ -251,16 +424,16 @@ const styles = StyleSheet.create({
   },
   itemsPanel: {
     borderWidth: 1,
-    borderColor: "#d8e5e1",
-    borderRadius: 16,
+    borderColor: "#dce8f1",
+    borderRadius: 20,
     backgroundColor: "#fff",
     padding: 12,
     gap: 10
   },
   summaryPanel: {
     borderWidth: 1,
-    borderColor: "#d8e5e1",
-    borderRadius: 16,
+    borderColor: "#dce8f1",
+    borderRadius: 20,
     backgroundColor: "#fff",
     padding: 14,
     gap: 9
@@ -272,8 +445,8 @@ const styles = StyleSheet.create({
   },
   itemCard: {
     borderWidth: 1,
-    borderColor: "#d7e4e0",
-    borderRadius: 14,
+    borderColor: "#e2eaf3",
+    borderRadius: 16,
     padding: 10,
     gap: 9,
     backgroundColor: "#fff"
@@ -281,8 +454,10 @@ const styles = StyleSheet.create({
   itemImage: {
     width: "100%",
     height: 150,
-    borderRadius: 12,
-    backgroundColor: "#eef3f7"
+    borderRadius: 14,
+    backgroundColor: "#f7fbff",
+    borderWidth: 1,
+    borderColor: "#e7eef7"
   },
   itemInfo: {
     gap: 3
@@ -371,27 +546,73 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 8
   },
-  paymentChip: {
+  paymentCard: {
+    width: "31%",
+    minWidth: 96,
     borderWidth: 1,
     borderColor: "#c8deda",
-    borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 10,
+    alignItems: "center",
+    gap: 6,
     backgroundColor: "#fff"
   },
-  paymentChipActive: {
+  paymentCardActive: {
     borderColor: "#0644ca",
     backgroundColor: "#eef4ff"
   },
+  paymentIcon: {
+    width: 58,
+    height: 34,
+    borderRadius: 8,
+    backgroundColor: "#fff"
+  },
   paymentChipText: {
     color: "#173240",
-    fontWeight: "800"
+    fontWeight: "800",
+    fontSize: 12,
+    textAlign: "center"
   },
   paymentChipTextActive: {
     color: "#0644ca"
   },
+  paymentFields: {
+    gap: 8
+  },
+  paymentInput: {
+    minHeight: 48,
+    borderWidth: 1,
+    borderColor: "#c8deda",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    color: "#173240",
+    fontWeight: "800",
+    backgroundColor: "#fff"
+  },
+  paymentTotalBox: {
+    minHeight: 54,
+    borderWidth: 1,
+    borderColor: "#c8deda",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    justifyContent: "center",
+    backgroundColor: "#f6fbff"
+  },
+  paymentTotalLabel: {
+    color: "#5f7380",
+    fontSize: 12,
+    fontWeight: "800",
+    textTransform: "uppercase"
+  },
+  paymentTotalValue: {
+    color: "#0b5f5c",
+    fontSize: 17,
+    fontWeight: "900"
+  },
   checkoutBtn: {
-    backgroundColor: "#0e7a78",
+    backgroundColor: "#0644ca",
     borderRadius: 12,
     paddingVertical: 13,
     alignItems: "center",

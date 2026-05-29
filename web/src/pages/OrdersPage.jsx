@@ -45,18 +45,20 @@ export default function OrdersPage() {
       </PageHeader>
 
       {orders.length === 0 && (
-        <section className="panel empty-state">
+        <section className="panel empty-state" data-cy="orders-empty-state">
           <h2>No orders yet</h2>
           <p className="muted">Complete checkout to create and track your first order.</p>
         </section>
       )}
 
-      <div className="order-list">
+      <div className="order-list" data-cy="orders-list">
         {orders.map((order) => (
-          <article key={order.id} className="order-card">
+          <article key={order.id} className="order-card" data-cy="order-card" data-order-id={order.id}>
             <div className="order-head">
               <h3>{order.orderNumber || `Order #${order.id.slice(0, 8)}`}</h3>
-              <span className="status-chip">{order.status}</span>
+              <span className="status-chip" data-cy="order-status">
+                {order.status}
+              </span>
             </div>
             <div className="order-meta-grid">
               <p>
@@ -72,7 +74,7 @@ export default function OrdersPage() {
                 <strong>Address:</strong> {order.shippingAddress}
               </p>
             </div>
-            <Link className="btn btn-light" to={`/orders/${order.id}`}>
+            <Link className="btn btn-light" to={`/orders/${order.id}`} data-cy="view-order-button">
               View Full Details
             </Link>
           </article>

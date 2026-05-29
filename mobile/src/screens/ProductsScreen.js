@@ -1,8 +1,10 @@
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 import { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -12,10 +14,14 @@ import {
 } from "react-native";
 import PageHeader from "../components/PageHeader";
 import ProductCard from "../components/ProductCard";
-import api, { getApiError } from "../api/client";
+import api, { getApiError, resolveAssetUrl } from "../api/client";
 import { useCart } from "../context/CartContext";
 import { useShop } from "../context/ShopContext";
 import { SHOP_CATEGORIES, getSubcategoriesForCategory } from "../data/shopCategories";
+import {
+  INVALID_NUMERIC_INPUT_MESSAGE,
+  getNumericInputError
+} from "../utils/numericValidation";
 
 const DEFAULT_FILTERS = {
   search: "",
@@ -24,8 +30,61 @@ const DEFAULT_FILTERS = {
   type: "",
   minPrice: "",
   maxPrice: "",
+  categoryFilter: "",
+  priceRange: "",
+  brand: "",
+  availability: "",
   sort: "newest"
 };
+
+const CATEGORY_FILTERS = [
+  {
+    value: "laptops",
+    label: "Laptops",
+    params: { category: "Computers", subcategory: "Laptops" }
+  },
+  {
+    value: "printers",
+    label: "Printers",
+    params: { category: "ICT Products", subcategory: "Printers & Scanners" }
+  },
+  {
+    value: "keyboards",
+    label: "Keyboards",
+    params: { category: "ICT Products", search: "keyboard" }
+  },
+  {
+    value: "hosting",
+    label: "Hosting Services",
+    params: { category: "Web Hosting Services" }
+  }
+];
+
+const PRICE_FILTERS = [
+  { value: "below-5000", label: "Below M5,000", params: { maxPrice: "5000" } },
+  { value: "5000-10000", label: "M5,000-M10,000", params: { minPrice: "5000", maxPrice: "10000" } },
+  { value: "above-10000", label: "Above M10,000", params: { minPrice: "10000" } }
+];
+
+const BRAND_FILTERS = ["HP", "Dell", "Lenovo", "Asus"];
+
+const AVAILABILITY_FILTERS = [
+  { value: "in-stock", label: "In Stock" },
+  { value: "out-of-stock", label: "Out of Stock" }
+];
+
+const FILTER_COUNT_KEYS = [
+  "search",
+  "category",
+  "subcategory",
+  "type",
+  "minPrice",
+  "maxPrice",
+  "categoryFilter",
+  "priceRange",
+  "brand",
+  "availability"
+];
 
 const SORT_OPTIONS = [
   { value: "newest", label: "Newest", api: "newest" },
@@ -35,6 +94,41 @@ const SORT_OPTIONS = [
   { value: "price_desc", label: "High Price", api: "price_desc" },
   { value: "name", label: "A-Z", api: "name_asc" }
 ];
+
+function getOptionParams(options, value) {
+  return options.find((option) => option.value === value)?.params || {};
+}
+
+function applyClientFilters(items, currentFilters) {
+  return items.filter((product) => {
+    if (currentFilters.brand) {
+      const haystack = [
+        product.name,
+        product.description,
+        product.brand,
+        product.provider,
+        ...(product.badges || []),
+        ...(product.specifications || []).map((spec) => `${spec.label} ${spec.value}`)
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      if (!haystack.includes(currentFilters.brand.toLowerCase())) {
+        return false;
+      }
+    }
+
+    if (currentFilters.availability === "in-stock") {
+      return product.type === "service" || Number(product.stock || 0) > 0;
+    }
+
+    if (currentFilters.availability === "out-of-stock") {
+      return product.type !== "service" && Number(product.stock || 0) <= 0;
+    }
+
+    return true;
+  });
+}
 
 export default function ProductsScreen() {
   const navigation = useNavigation();
@@ -46,30 +140,47 @@ export default function ProductsScreen() {
   const [error, setError] = useState("");
   const [status, setStatus] = useState("");
   const [busyId, setBusyId] = useState("");
+  const [sortMenuOpen, setSortMenuOpen] = useState(false);
 
   const subcategories = useMemo(
     () => getSubcategoriesForCategory(filters.category),
     [filters.category]
   );
 
+  const activeFilterCount = useMemo(
+    () =>
+      FILTER_COUNT_KEYS.filter(
+        (key) => filters[key] && filters[key] !== DEFAULT_FILTERS[key]
+      ).length,
+    [filters]
+  );
+
   const fetchProducts = async (nextFilters = filters) => {
     setLoading(true);
     setError("");
     try {
+      const categoryParams = getOptionParams(CATEGORY_FILTERS, nextFilters.categoryFilter);
+      const priceParams = getOptionParams(PRICE_FILTERS, nextFilters.priceRange);
+      const apiFilters = {
+        ...nextFilters,
+        ...categoryParams,
+        ...priceParams
+      };
       const selectedSort =
         SORT_OPTIONS.find((option) => option.value === nextFilters.sort) || SORT_OPTIONS[0];
       const { data } = await api.get("/products", {
         params: {
-          search: nextFilters.search || undefined,
-          category: nextFilters.category || undefined,
-          subcategory: nextFilters.subcategory || undefined,
-          type: nextFilters.type || undefined,
-          minPrice: nextFilters.minPrice || undefined,
-          maxPrice: nextFilters.maxPrice || undefined,
+          search: apiFilters.search || undefined,
+          category: apiFilters.category || undefined,
+          subcategory: apiFilters.subcategory || undefined,
+          type: apiFilters.type || undefined,
+          minPrice: apiFilters.minPrice || undefined,
+          maxPrice: apiFilters.maxPrice || undefined,
+          pageSize: 60,
           sort: selectedSort.api
         }
       });
-      setProducts(data.products || []);
+      setProducts(applyClientFilters(data.products || [], nextFilters));
     } catch (fetchError) {
       setError(getApiError(fetchError, "Failed to load products."));
     } finally {
@@ -85,10 +196,36 @@ export default function ProductsScreen() {
   );
 
   const updateFilters = (updates, apply = false) => {
+    const priceInputError =
+      updates.minPrice !== undefined
+        ? getNumericInputError(updates.minPrice, "decimal")
+        : updates.maxPrice !== undefined
+          ? getNumericInputError(updates.maxPrice, "decimal")
+          : "";
+
+    if (priceInputError) {
+      setError(priceInputError);
+      return;
+    }
+
+    if (updates.minPrice !== undefined || updates.maxPrice !== undefined) {
+      setError((current) => (current === INVALID_NUMERIC_INPUT_MESSAGE ? "" : current));
+    }
+
     const next = { ...filters, ...updates };
     if (updates.category !== undefined) {
       next.subcategory = "";
       next.type = updates.category === "Web Hosting Services" ? "service" : "";
+      next.categoryFilter = "";
+    }
+    if (updates.categoryFilter !== undefined) {
+      next.category = "";
+      next.subcategory = "";
+      next.type = "";
+    }
+    if (updates.priceRange !== undefined) {
+      next.minPrice = "";
+      next.maxPrice = "";
     }
     setFilters(next);
     if (apply) {
@@ -98,6 +235,7 @@ export default function ProductsScreen() {
 
   const clearFilters = () => {
     setFilters(DEFAULT_FILTERS);
+    setSortMenuOpen(false);
     fetchProducts(DEFAULT_FILTERS);
   };
 
@@ -154,6 +292,11 @@ export default function ProductsScreen() {
                     ]}
                     onPress={() => updateFilters({ category: item.category }, true)}
                   >
+                    <Image
+                      source={{ uri: resolveAssetUrl(item.imageUrl) }}
+                      style={styles.categoryImage}
+                      resizeMode="cover"
+                    />
                     <Text style={styles.categoryTitle}>{item.title}</Text>
                     <Text style={styles.categoryDescription} numberOfLines={2}>
                       {item.description}
@@ -164,95 +307,233 @@ export default function ProductsScreen() {
             </View>
 
             <View style={styles.panel}>
-              <TextInput
-                style={styles.input}
-                placeholder="Search products..."
-                value={filters.search}
-                onChangeText={(value) => updateFilters({ search: value })}
-                onSubmitEditing={() => fetchProducts()}
-              />
-              <View style={styles.twoCol}>
+              <View style={styles.searchRow}>
                 <TextInput
-                  style={styles.input}
-                  placeholder="Min price"
-                  keyboardType="numeric"
-                  value={filters.minPrice}
-                  onChangeText={(value) => updateFilters({ minPrice: value })}
+                  style={[styles.input, styles.searchInput]}
+                  placeholder="Search products..."
+                  value={filters.search}
+                  onChangeText={(value) => updateFilters({ search: value })}
+                  onSubmitEditing={() => fetchProducts()}
                 />
-                <TextInput
-                  style={styles.input}
-                  placeholder="Max price"
-                  keyboardType="numeric"
-                  value={filters.maxPrice}
-                  onChangeText={(value) => updateFilters({ maxPrice: value })}
-                />
-              </View>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
-                {["", "physical", "service"].map((type) => (
-                  <Pressable
-                    key={type || "all"}
-                    style={[styles.chip, filters.type === type && styles.chipActive]}
-                    onPress={() => updateFilters({ type }, true)}
-                  >
-                    <Text style={[styles.chipText, filters.type === type && styles.chipTextActive]}>
-                      {type ? type : "All Types"}
+                <Pressable
+                  style={[styles.sortButton, sortMenuOpen && styles.sortButtonActive]}
+                  onPress={() => setSortMenuOpen((open) => !open)}
+                  accessibilityRole="button"
+                  accessibilityLabel="Open sort and filters"
+                >
+                  <Ionicons
+                    name="options-outline"
+                    size={21}
+                    color={sortMenuOpen ? "#ffffff" : "#0644ca"}
+                  />
+                  <View style={styles.sortButtonCopy}>
+                    <Text style={[styles.sortButtonText, sortMenuOpen && styles.sortButtonTextActive]}>
+                      Sort
                     </Text>
-                  </Pressable>
-                ))}
-              </ScrollView>
-              {subcategories.length > 0 ? (
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
-                  {subcategories.map((subcategory) => (
-                    <Pressable
-                      key={subcategory}
-                      style={[styles.chip, filters.subcategory === subcategory && styles.chipActive]}
-                      onPress={() => updateFilters({ subcategory }, true)}
-                    >
-                      <Text
-                        style={[
-                          styles.chipText,
-                          filters.subcategory === subcategory && styles.chipTextActive
-                        ]}
+                    <Text style={[styles.sortButtonMeta, sortMenuOpen && styles.sortButtonMetaActive]}>
+                      {activeFilterCount > 0
+                        ? `${activeFilterCount} filter${activeFilterCount === 1 ? "" : "s"}`
+                        : "Filters"}
+                    </Text>
+                  </View>
+                  <Ionicons
+                    name={sortMenuOpen ? "chevron-up" : "chevron-down"}
+                    size={16}
+                    color={sortMenuOpen ? "#ffffff" : "#5d7380"}
+                  />
+                </Pressable>
+              </View>
+
+              {sortMenuOpen ? (
+                <View style={styles.filterMenu}>
+                  <View style={styles.twoCol}>
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Min price"
+                      keyboardType="numeric"
+                      value={filters.minPrice}
+                      onChangeText={(value) => updateFilters({ minPrice: value })}
+                    />
+                    <TextInput
+                      style={styles.input}
+                      placeholder="Max price"
+                      keyboardType="numeric"
+                      value={filters.maxPrice}
+                      onChangeText={(value) => updateFilters({ maxPrice: value })}
+                    />
+                  </View>
+
+                  <Text style={styles.filterTitle}>Category filters</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                    {CATEGORY_FILTERS.map((option) => (
+                      <Pressable
+                        key={option.value}
+                        style={[styles.chip, filters.categoryFilter === option.value && styles.chipActive]}
+                        onPress={() =>
+                          updateFilters(
+                            { categoryFilter: filters.categoryFilter === option.value ? "" : option.value },
+                            true
+                          )
+                        }
                       >
-                        {subcategory}
-                      </Text>
+                        <Text
+                          style={[
+                            styles.chipText,
+                            filters.categoryFilter === option.value && styles.chipTextActive
+                          ]}
+                        >
+                          {option.label}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
+
+                  <Text style={styles.filterTitle}>Price filters</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                    {PRICE_FILTERS.map((option) => (
+                      <Pressable
+                        key={option.value}
+                        style={[styles.chip, filters.priceRange === option.value && styles.chipActive]}
+                        onPress={() =>
+                          updateFilters(
+                            { priceRange: filters.priceRange === option.value ? "" : option.value },
+                            true
+                          )
+                        }
+                      >
+                        <Text
+                          style={[
+                            styles.chipText,
+                            filters.priceRange === option.value && styles.chipTextActive
+                          ]}
+                        >
+                          {option.label}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
+
+                  <Text style={styles.filterTitle}>Brand filters</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                    {BRAND_FILTERS.map((brand) => (
+                      <Pressable
+                        key={brand}
+                        style={[styles.chip, filters.brand === brand && styles.chipActive]}
+                        onPress={() => updateFilters({ brand: filters.brand === brand ? "" : brand }, true)}
+                      >
+                        <Text style={[styles.chipText, filters.brand === brand && styles.chipTextActive]}>
+                          {brand}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
+
+                  <Text style={styles.filterTitle}>Availability</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                    {AVAILABILITY_FILTERS.map((option) => (
+                      <Pressable
+                        key={option.value}
+                        style={[styles.chip, filters.availability === option.value && styles.chipActive]}
+                        onPress={() =>
+                          updateFilters(
+                            { availability: filters.availability === option.value ? "" : option.value },
+                            true
+                          )
+                        }
+                      >
+                        <Text
+                          style={[
+                            styles.chipText,
+                            filters.availability === option.value && styles.chipTextActive
+                          ]}
+                        >
+                          {option.label}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
+
+                  <Text style={styles.filterTitle}>Product type</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                    {["", "physical", "service"].map((type) => (
+                      <Pressable
+                        key={type || "all"}
+                        style={[styles.chip, filters.type === type && styles.chipActive]}
+                        onPress={() => updateFilters({ type }, true)}
+                      >
+                        <Text style={[styles.chipText, filters.type === type && styles.chipTextActive]}>
+                          {type ? type : "All Types"}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
+                  {subcategories.length > 0 ? (
+                    <>
+                      <Text style={styles.filterTitle}>Subcategory</Text>
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                        {subcategories.map((subcategory) => (
+                          <Pressable
+                            key={subcategory}
+                            style={[styles.chip, filters.subcategory === subcategory && styles.chipActive]}
+                            onPress={() => updateFilters({ subcategory }, true)}
+                          >
+                            <Text
+                              style={[
+                                styles.chipText,
+                                filters.subcategory === subcategory && styles.chipTextActive
+                              ]}
+                            >
+                              {subcategory}
+                            </Text>
+                          </Pressable>
+                        ))}
+                      </ScrollView>
+                    </>
+                  ) : null}
+
+                  <Text style={styles.filterTitle}>Sort by</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                    {SORT_OPTIONS.map((option) => (
+                      <Pressable
+                        key={option.value}
+                        style={[styles.chip, filters.sort === option.value && styles.chipActive]}
+                        onPress={() => updateFilters({ sort: option.value }, true)}
+                      >
+                        <Text
+                          style={[
+                            styles.chipText,
+                            filters.sort === option.value && styles.chipTextActive
+                          ]}
+                        >
+                          {option.label}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </ScrollView>
+
+                  <View style={styles.buttonRow}>
+                    <Pressable style={styles.secondaryButton} onPress={clearFilters}>
+                      <Text style={styles.secondaryButtonText}>Clear</Text>
                     </Pressable>
-                  ))}
-                </ScrollView>
-              ) : null}
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
-                {SORT_OPTIONS.map((option) => (
-                  <Pressable
-                    key={option.value}
-                    style={[styles.chip, filters.sort === option.value && styles.chipActive]}
-                    onPress={() => updateFilters({ sort: option.value }, true)}
-                  >
-                    <Text
-                      style={[
-                        styles.chipText,
-                        filters.sort === option.value && styles.chipTextActive
-                      ]}
+                    <Pressable
+                      style={styles.primaryButton}
+                      onPress={() => {
+                        setSortMenuOpen(false);
+                        fetchProducts();
+                      }}
                     >
-                      {option.label}
-                    </Text>
-                  </Pressable>
-                ))}
-              </ScrollView>
-              <View style={styles.buttonRow}>
-                <Pressable style={styles.secondaryButton} onPress={clearFilters}>
-                  <Text style={styles.secondaryButtonText}>Clear</Text>
-                </Pressable>
-                <Pressable style={styles.primaryButton} onPress={() => fetchProducts()}>
-                  <Text style={styles.primaryButtonText}>Apply Filters</Text>
-                </Pressable>
-              </View>
+                      <Text style={styles.primaryButtonText}>Apply Filters</Text>
+                    </Pressable>
+                  </View>
+                </View>
+              ) : null}
             </View>
 
             {error ? <Text style={styles.error}>{error}</Text> : null}
             {status ? <Text style={styles.status}>{status}</Text> : null}
             {loading ? (
               <View style={styles.loadingInline}>
-                <ActivityIndicator color="#0e7a78" />
+                <ActivityIndicator color="#0644ca" />
                 <Text style={styles.loadingText}>Loading products...</Text>
               </View>
             ) : null}
@@ -284,7 +565,7 @@ export default function ProductsScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#f4f8f7"
+    backgroundColor: "#f4f8fb"
   },
   listContent: {
     padding: 12,
@@ -293,12 +574,17 @@ const styles = StyleSheet.create({
   },
   panel: {
     borderWidth: 1,
-    borderColor: "#d8e5e1",
-    borderRadius: 16,
+    borderColor: "#dce8f1",
+    borderRadius: 20,
     backgroundColor: "#fff",
-    padding: 12,
+    padding: 14,
     gap: 10,
-    marginBottom: 2
+    marginBottom: 2,
+    shadowColor: "#0b376b",
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 2
   },
   panelHead: {
     flexDirection: "row",
@@ -315,18 +601,24 @@ const styles = StyleSheet.create({
     fontWeight: "900"
   },
   categoryCard: {
-    width: 210,
-    minHeight: 100,
+    width: 224,
+    minHeight: 176,
     borderWidth: 1,
     borderColor: "#e2e8f2",
-    borderRadius: 14,
+    borderRadius: 18,
     backgroundColor: "#fff",
-    padding: 12,
+    padding: 10,
     gap: 6
   },
   categoryCardActive: {
     borderColor: "#0644ca",
     backgroundColor: "#eef4ff"
+  },
+  categoryImage: {
+    width: "100%",
+    height: 92,
+    borderRadius: 14,
+    backgroundColor: "#f3f7fb"
   },
   categoryTitle: {
     color: "#081327",
@@ -340,11 +632,63 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#ccddda",
+    borderColor: "#d2e0ec",
     borderRadius: 12,
     paddingHorizontal: 12,
-    paddingVertical: 10,
-    backgroundColor: "#fff"
+    paddingVertical: 12,
+    backgroundColor: "#fff",
+    color: "#081327",
+    fontWeight: "700"
+  },
+  searchRow: {
+    flexDirection: "row",
+    alignItems: "stretch",
+    gap: 8
+  },
+  searchInput: {
+    minHeight: 52
+  },
+  sortButton: {
+    width: 132,
+    minHeight: 52,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#d8e5ff",
+    backgroundColor: "#f5f8ff",
+    paddingHorizontal: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6
+  },
+  sortButtonActive: {
+    borderColor: "#0644ca",
+    backgroundColor: "#0644ca"
+  },
+  sortButtonCopy: {
+    minWidth: 48
+  },
+  sortButtonText: {
+    color: "#10264a",
+    fontSize: 13,
+    fontWeight: "900"
+  },
+  sortButtonTextActive: {
+    color: "#ffffff"
+  },
+  sortButtonMeta: {
+    color: "#5d7380",
+    fontSize: 10,
+    fontWeight: "900"
+  },
+  sortButtonMetaActive: {
+    color: "rgba(255,255,255,0.82)"
+  },
+  filterMenu: {
+    borderTopWidth: 1,
+    borderTopColor: "#e5eef6",
+    paddingTop: 12,
+    gap: 10
   },
   twoCol: {
     flexDirection: "row",
@@ -354,12 +698,19 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 2
   },
+  filterTitle: {
+    color: "#10264a",
+    fontSize: 12,
+    fontWeight: "900",
+    letterSpacing: 0.4,
+    textTransform: "uppercase"
+  },
   chip: {
     borderWidth: 1,
-    borderColor: "#c8deda",
+    borderColor: "#d2e0ec",
     borderRadius: 999,
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 9,
     backgroundColor: "#fff"
   },
   chipActive: {
@@ -381,9 +732,9 @@ const styles = StyleSheet.create({
   primaryButton: {
     flex: 1,
     borderRadius: 12,
-    backgroundColor: "#0e7a78",
+    backgroundColor: "#0644ca",
     alignItems: "center",
-    paddingVertical: 12
+    paddingVertical: 13
   },
   primaryButtonText: {
     color: "#fff",
@@ -392,11 +743,11 @@ const styles = StyleSheet.create({
   secondaryButton: {
     flex: 1,
     borderRadius: 12,
-    backgroundColor: "#f2f8f6",
+    backgroundColor: "#f5f8ff",
     alignItems: "center",
-    paddingVertical: 12,
+    paddingVertical: 13,
     borderWidth: 1,
-    borderColor: "#c8deda"
+    borderColor: "#d8e5ff"
   },
   secondaryButtonText: {
     color: "#173240",
@@ -434,8 +785,8 @@ const styles = StyleSheet.create({
   },
   empty: {
     borderWidth: 1,
-    borderColor: "#d8e5e1",
-    borderRadius: 14,
+    borderColor: "#dce8f1",
+    borderRadius: 18,
     backgroundColor: "#fff",
     padding: 16
   },

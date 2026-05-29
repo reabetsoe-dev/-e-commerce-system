@@ -23,7 +23,14 @@ function createOrderForCustomer() {
             method: "POST",
             url: `${Cypress.env("apiUrl")}/checkout`,
             headers: { Authorization: `Bearer ${auth.token}` },
-            body: { paymentMethod: "Card", shippingAddress: "Not required" }
+            body: {
+              paymentMethod: "Debit card",
+              paymentDetails: {
+                cardNumber: "4111111111111111",
+                cvc: "123"
+              },
+              shippingAddress: "Not required"
+            }
           })
         )
         .then(({ body: checkoutBody }) => checkoutBody.order.id);

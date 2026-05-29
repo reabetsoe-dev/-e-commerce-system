@@ -10,3 +10,6 @@ yarn-debug.log*
 yarn-error.log*
 .DS_Store
 backend/data/db.json
+web/cypress/artifacts/screenshots/
+web/cypress/artifacts/videos/
+web/.cypress-cache/

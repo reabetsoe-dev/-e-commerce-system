@@ -2,7 +2,7 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const morgan = require("morgan");
-const { PORT } = require("./config");
+const { HOST, PORT } = require("./config");
 const authRoutes = require("./routes/auth");
 const productsRoutes = require("./routes/products");
 const cartRoutes = require("./routes/cart");
@@ -23,6 +23,7 @@ app.use(
 app.use(express.json({ limit: "50mb" }));
 app.use(morgan("dev"));
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+app.use("/images", express.static(path.join(__dirname, "../../web/public/images")));
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", service: "group-project-2026-backend" });
@@ -47,8 +48,12 @@ app.use((error, req, res, next) => {
 
 async function start() {
   await readDb();
-  app.listen(PORT, () => {
-    console.log(`Backend server running on http://localhost:${PORT}`);
+  app.listen(PORT, HOST, () => {
+    const displayHost = HOST === "0.0.0.0" ? "localhost" : HOST;
+    console.log(`Backend server running on http://${displayHost}:${PORT}`);
+    if (HOST === "0.0.0.0") {
+      console.log("Backend is listening on all network interfaces for Expo Go.");
+    }
   });
 }
 

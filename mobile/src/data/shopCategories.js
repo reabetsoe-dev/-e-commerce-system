@@ -4,8 +4,8 @@ export const PRODUCT_CATEGORIES = [
     category: "Computers",
     defaultType: "physical",
     subcategories: ["Laptops", "Desktops", "Components", "Monitors", "Computer Bundles"],
-    imageUrl:
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=80",
+    imageUrl: "/images/laptop.jpg",
+    imageAlt: "Laptop computer on a desk",
     description: "Laptops, desktops, components, monitors, and complete computer bundles."
   },
   {
@@ -23,8 +23,8 @@ export const PRODUCT_CATEGORIES = [
       "Office Equipment",
       "Security Products"
     ],
-    imageUrl:
-      "https://images.unsplash.com/photo-1588508065123-287b28e013da?auto=format&fit=crop&w=800&q=80",
+    imageUrl: "/images/ict.jpg",
+    imageAlt: "Assorted ICT products and computer accessories",
     description: "Accessories, storage, printers, networking, power, AV, smart, and office gear."
   },
   {
@@ -42,8 +42,8 @@ export const PRODUCT_CATEGORIES = [
       "Developer Services",
       "Ecommerce Services"
     ],
-    imageUrl:
-      "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=800&q=80",
+    imageUrl: "/images/web-hosting-services.png",
+    imageAlt: "Web hosting services data center with cloud hosting features",
     description: "Hosting, domains, websites, email, servers, security, cloud, developer, and store services."
   }
 ];
@@ -64,4 +64,8 @@ export function getDefaultSubcategory(category) {
 
 export function getDefaultProductType(category) {
   return getCategoryConfig(category)?.defaultType || "physical";
+}
+
+export function getAllSubcategories() {
+  return PRODUCT_CATEGORIES.flatMap((category) => category.subcategories);
 }

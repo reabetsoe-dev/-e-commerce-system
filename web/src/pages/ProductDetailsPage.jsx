@@ -34,6 +34,10 @@ export default function ProductDetailsPage() {
   }, [product]);
   const isService = product?.type === "service";
   const isOutOfStock = product ? !isService && product.stock <= 0 : false;
+  const brandLabel = isService ? "Provider" : "Brand";
+  const brandOrProvider = product?.provider || product?.brand;
+  const availability =
+    product?.availabilityStatus || (isService ? "Available" : isOutOfStock ? "Out of Stock" : "In Stock");
 
   useEffect(() => {
     async function fetchProductDetails() {
@@ -159,16 +163,21 @@ export default function ProductDetailsPage() {
             {product.subcategory && <span className="tag tag-muted">{product.subcategory}</span>}
           </div>
           <h1>{product.name}</h1>
+          {brandOrProvider && (
+            <p className="muted">
+              {brandLabel}: {brandOrProvider}
+            </p>
+          )}
           <p className="muted">{product.description}</p>
           <p className="rating-line">
             Rating {product.rating} ({product.reviewsCount} reviews)
           </p>
           <p className={!isService && product.stock <= 5 ? "stock-warn" : "muted"}>
             {isService
-              ? "Service item"
+              ? availability
               : product.stock <= 5
-              ? `Low stock (${product.stock} left)`
-              : `In stock (${product.stock})`}
+              ? `${availability} (${product.stock} left)`
+              : `${availability} (${product.stock})`}
           </p>
           <div className="price-row large">
             {product.discountPercent > 0 && (

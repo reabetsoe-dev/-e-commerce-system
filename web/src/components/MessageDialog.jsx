@@ -4,11 +4,22 @@ export default function MessageDialog({ message, onClose }) {
   }
 
   return (
-    <div className="modal-backdrop" role="presentation">
-      <article className="modal-card message-dialog" role="alertdialog" aria-modal="true">
+    <div className="modal-backdrop" role="presentation" data-cy="message-dialog">
+      <article
+        className="modal-card message-dialog"
+        role="alertdialog"
+        aria-modal="true"
+        data-cy="message-dialog-card"
+      >
         <h2>Cart Updated</h2>
-        <p>{message}</p>
-        <button type="button" className="btn btn-primary" onClick={onClose} autoFocus>
+        <p data-cy="message-dialog-text">{message}</p>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={onClose}
+          autoFocus
+          data-cy="message-dialog-ok"
+        >
           OK
         </button>
       </article>
