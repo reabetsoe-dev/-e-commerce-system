@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { formatMoney } from "../utils/currency";
+import { applyImageFallback, getImageSource } from "../utils/imageFallbacks";
 
 function CartIcon() {
   return (
@@ -38,7 +39,11 @@ export default function ProductCard({
         &hearts;
       </button>
       <div className="product-image-frame">
-        <img src={product.imageUrl} alt={product.name} />
+        <img
+          src={getImageSource(product.imageUrl, product.category)}
+          alt={product.name}
+          onError={(event) => applyImageFallback(event, product.category)}
+        />
       </div>
       <div className="product-content">
         <h3 data-cy="product-name">{product.name}</h3>

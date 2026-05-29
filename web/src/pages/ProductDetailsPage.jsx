@@ -8,6 +8,7 @@ import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { useShop } from "../context/ShopContext";
 import { formatMoney } from "../utils/currency";
+import { applyImageFallback, getImageSource } from "../utils/imageFallbacks";
 
 const SAMPLE_REVIEWERS = ["A. Molefe", "P. Ndlovu", "K. Dlamini", "R. Sithole"];
 
@@ -143,7 +144,12 @@ export default function ProductDetailsPage() {
       />
       <section className="panel details-layout">
         <div className="gallery-col">
-          <img className="main-image" src={selectedImage || product.imageUrl} alt={product.name} />
+          <img
+            className="main-image"
+            src={getImageSource(selectedImage || product.imageUrl, product.category)}
+            alt={product.name}
+            onError={(event) => applyImageFallback(event, product.category)}
+          />
           <div className="thumb-row">
             {(product.gallery?.length ? product.gallery : [product.imageUrl]).map((image) => (
               <button
@@ -152,7 +158,11 @@ export default function ProductDetailsPage() {
                 className={`thumb-btn ${selectedImage === image ? "active" : ""}`}
                 onClick={() => setSelectedImage(image)}
               >
-                <img src={image} alt={product.name} />
+                <img
+                  src={getImageSource(image, product.category)}
+                  alt={product.name}
+                  onError={(event) => applyImageFallback(event, product.category)}
+                />
               </button>
             ))}
           </div>

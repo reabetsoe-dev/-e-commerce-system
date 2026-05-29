@@ -9,6 +9,7 @@ import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import { useShop } from "../context/ShopContext";
 import { SHOP_CATEGORIES } from "../data/shopCategories";
+import { applyImageFallback, getImageSource } from "../utils/imageFallbacks";
 
 const DEFAULT_FILTERS = {
   search: "",
@@ -486,7 +487,11 @@ export default function ProductsPage() {
               aria-pressed={filters.category === item.category}
               onClick={() => onCategorySelect(item.category)}
             >
-              <img src={item.imageUrl} alt={item.imageAlt} />
+              <img
+                src={getImageSource(item.imageUrl, item.category)}
+                alt={item.imageAlt}
+                onError={(event) => applyImageFallback(event, item.category)}
+              />
               <span className="shop-category-copy">
                 <strong>{item.title}</strong>
               </span>
