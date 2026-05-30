@@ -170,6 +170,7 @@ export default function CheckoutPage() {
   const [step, setStep] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
   const [form, setForm] = useState({
     fullName: user?.name || "",
     emailAddress: user?.email || "",
@@ -217,10 +218,14 @@ export default function CheckoutPage() {
     if (numericMode) {
       const inputError = getNumericInputError(value, numericMode);
       if (inputError) {
-        setError(inputError);
+        setFieldErrors((current) => ({ ...current, [field]: inputError }));
         return;
       }
-      setError((current) => (current === INVALID_NUMERIC_INPUT_MESSAGE ? "" : current));
+      setFieldErrors((current) => {
+        const nextErrors = { ...current };
+        delete nextErrors[field];
+        return nextErrors;
+      });
     }
 
     setForm((current) => ({ ...current, [field]: value }));
@@ -228,44 +233,65 @@ export default function CheckoutPage() {
 
   const selectPaymentMethod = (method) => {
     setError("");
+    setFieldErrors({});
     setForm((current) => ({ ...current, paymentMethod: method }));
   };
 
   const validatePayment = () => {
     const mobileMoneyNumber = form.lesothoNumber || form.phoneNumber;
-    const phoneInputError = getNumericInputError(form.phoneNumber, "phone");
-    const postalInputError = getNumericInputError(form.postalCode, "digits");
+    const nextFieldErrors = {};
 
-    if (phoneInputError || postalInputError) {
-      return INVALID_NUMERIC_INPUT_MESSAGE;
+    const phoneInputError = getNumericInputError(form.phoneNumber, "phone");
+    if (phoneInputError) {
+      nextFieldErrors.phoneNumber = phoneInputError;
+    }
+
+    const postalInputError = getNumericInputError(form.postalCode, "digits");
+    if (postalInputError) {
+      nextFieldErrors.postalCode = postalInputError;
     }
 
     if (paymentIsMobileMoney) {
       const mobileMoneyInputError = getNumericInputError(mobileMoneyNumber, "phone");
       if (mobileMoneyInputError) {
-        return INVALID_NUMERIC_INPUT_MESSAGE;
+        nextFieldErrors[form.lesothoNumber ? "lesothoNumber" : "phoneNumber"] = mobileMoneyInputError;
       }
 
       if (!isValidLesothoNumber(mobileMoneyNumber)) {
+        setFieldErrors(nextFieldErrors);
         return "Enter a valid Lesotho mobile number, for example +266 5xxx xxxx.";
       }
     }
 
     if (form.paymentMethod === "Debit card") {
-      const cardInputError =
-        getNumericInputError(form.cardNumber, "card") ||
-        getNumericInputError(form.expiryDate, "expiry") ||
-        getNumericInputError(form.cvc, "digits");
+      const cardInputError = getNumericInputError(form.cardNumber, "card");
       if (cardInputError) {
-        return INVALID_NUMERIC_INPUT_MESSAGE;
+        nextFieldErrors.cardNumber = cardInputError;
+      }
+
+      const expiryInputError = getNumericInputError(form.expiryDate, "expiry");
+      if (expiryInputError) {
+        nextFieldErrors.expiryDate = expiryInputError;
+      }
+
+      const cvcInputError = getNumericInputError(form.cvc, "digits");
+      if (cvcInputError) {
+        nextFieldErrors.cvc = cvcInputError;
       }
 
       if (!isValidCardNumber(form.cardNumber)) {
+        setFieldErrors(nextFieldErrors);
         return "Enter a valid debit card number.";
       }
       if (!isValidCvc(form.cvc)) {
+        setFieldErrors(nextFieldErrors);
         return "Enter a valid CVC.";
       }
+    }
+
+    setFieldErrors(nextFieldErrors);
+    if (Object.keys(nextFieldErrors).length) {
+      return INVALID_NUMERIC_INPUT_MESSAGE;
     }
 
     return "";
@@ -307,7 +333,9 @@ export default function CheckoutPage() {
   const nextStep = () => {
     const validationError = validatePayment();
     if (validationError) {
-      setError(validationError);
+      if (validationError !== INVALID_NUMERIC_INPUT_MESSAGE) {
+        setError(validationError);
+      }
       return;
     }
 
@@ -319,7 +347,9 @@ export default function CheckoutPage() {
   const placeOrder = async () => {
     const validationError = validatePayment();
     if (validationError) {
-      setError(validationError);
+      if (validationError !== INVALID_NUMERIC_INPUT_MESSAGE) {
+        setError(validationError);
+      }
       setStep(0);
       return;
     }
@@ -434,6 +464,7 @@ export default function CheckoutPage() {
                           placeholder="+266 5800 0000"
                           autoComplete="tel"
                         />
+                        {fieldErrors.phoneNumber && <small className="checkout-field-error">{fieldErrors.phoneNumber}</small>}
                       </label>
                       <label className="checkout-address-field">
                         <span>Delivery Address</span>
@@ -465,6 +496,7 @@ export default function CheckoutPage() {
                           placeholder="100"
                           autoComplete="postal-code"
                         />
+                        {fieldErrors.postalCode && <small className="checkout-field-error">{fieldErrors.postalCode}</small>}
                       </label>
                     </div>
 
@@ -569,6 +601,9 @@ export default function CheckoutPage() {
                                 autoComplete="tel"
                                 data-cy="checkout-lesotho-number"
                               />
+                              {fieldErrors.lesothoNumber && (
+                                <small className="checkout-field-error">{fieldErrors.lesothoNumber}</small>
+                              )}
                             </label>
                             <div className="checkout-payment-total" data-cy="checkout-payment-total">
                               <span>Amount</span>
@@ -584,50 +619,65 @@ export default function CheckoutPage() {
                         {form.paymentMethod === "Debit card" && (
                           <div className="checkout-field-grid checkout-card-fields">
                             <label>
-                              <span>Cardholder Name</span>
+                              <span>Account Name</span>
                               <input
                                 type="text"
                                 value={form.cardholderName}
                                 onChange={(event) => updateForm("cardholderName", event.target.value)}
                                 placeholder="Teboho Mokone"
-                                autoComplete="cc-name"
+                                name="simulated-account-name"
+                                autoComplete="new-password"
+                                data-form-type="other"
                               />
                             </label>
                             <label>
-                              <span>Card Number</span>
+                              <span>Payment Reference</span>
                               <input
                                 type="text"
                                 inputMode="numeric"
                                 value={form.cardNumber}
                                 onChange={(event) => updateForm("cardNumber", event.target.value)}
-                                placeholder="4242 4242 4242 4242"
-                                autoComplete="cc-number"
+                                placeholder="0000 0000 0000 0000"
+                                name="simulated-payment-reference"
+                                autoComplete="new-password"
+                                data-form-type="other"
                                 data-cy="checkout-card-number"
                               />
+                              {fieldErrors.cardNumber && (
+                                <small className="checkout-field-error">{fieldErrors.cardNumber}</small>
+                              )}
                             </label>
                             <label>
-                              <span>Expiry Date</span>
+                              <span>Reference Date</span>
                               <input
                                 type="text"
                                 inputMode="numeric"
                                 value={form.expiryDate}
                                 onChange={(event) => updateForm("expiryDate", event.target.value)}
                                 placeholder="MM/YY"
-                                autoComplete="cc-exp"
+                                name="simulated-reference-date"
+                                autoComplete="new-password"
+                                data-form-type="other"
                               />
+                              {fieldErrors.expiryDate && (
+                                <small className="checkout-field-error">{fieldErrors.expiryDate}</small>
+                              )}
                             </label>
                             <label>
-                              <span>CVV</span>
+                              <span>Security Code</span>
                               <input
                                 type="text"
                                 inputMode="numeric"
                                 maxLength="4"
                                 value={form.cvc}
                                 onChange={(event) => updateForm("cvc", event.target.value)}
-                                placeholder="123"
-                                autoComplete="cc-csc"
+                                placeholder="000"
+                                name="simulated-security-code"
+                                autoComplete="new-password"
+                                data-form-type="other"
                                 data-cy="checkout-card-cvc"
                               />
+                              {fieldErrors.cvc && <small className="checkout-field-error">{fieldErrors.cvc}</small>}
                             </label>
                             <p className="checkout-simulated-note">
                               <CheckoutIcon name="shield" />

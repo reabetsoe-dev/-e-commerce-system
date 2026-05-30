@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { formatMoney } from "../utils/currency";
 import {
@@ -99,6 +99,7 @@ function CartIcon({ name, className = "cart-page-icon" }) {
         <path d="M12 14v3" />
       </>
     ),
+    back: <path d="M19 12H5M11 6l-6 6 6 6" />,
     arrow: <path d="M5 12h14M13 6l6 6-6 6" />,
     clipboard: (
       <>
@@ -205,9 +206,11 @@ function getItemSpecs(item) {
 }
 
 export default function CartPage() {
+  const navigate = useNavigate();
   const { cart, refreshCart, updateQuantity, removeItem, getErrorMessage } = useCart();
   const [busyId, setBusyId] = useState("");
   const [error, setError] = useState("");
+  const [quantityErrors, setQuantityErrors] = useState({});
 
   const totals = useMemo(() => {
     const subtotal = Number(cart.summary?.subtotal ?? cart.total ?? 0);
@@ -226,9 +229,14 @@ export default function CartPage() {
   const onUpdateQty = async (productId, quantity) => {
     const inputError = getNumericInputError(quantity, "digits");
     if (inputError) {
-      setError(INVALID_NUMERIC_INPUT_MESSAGE);
+      setQuantityErrors((current) => ({ ...current, [productId]: INVALID_NUMERIC_INPUT_MESSAGE }));
       return;
     }
+    setQuantityErrors((current) => {
+      const nextErrors = { ...current };
+      delete nextErrors[productId];
+      return nextErrors;
+    });
 
     const nextQuantity = Number(quantity);
     if (!Number.isFinite(nextQuantity) || nextQuantity < 1) {
@@ -285,10 +293,16 @@ export default function CartPage() {
             </span>
             <h1>Your cart is empty</h1>
             <p>Browse the catalog and add products to continue.</p>
-            <Link className="cart-checkout-btn" to="/catalog">
-              Explore Catalog
-              <CartIcon name="arrow" />
-            </Link>
+            <div className="cart-empty-actions">
+              <button type="button" className="cart-return-btn" onClick={() => navigate(-1)}>
+                <CartIcon name="back" />
+                Return
+              </button>
+              <Link className="cart-checkout-btn" to="/catalog">
+                Explore Catalog
+                <CartIcon name="arrow" />
+              </Link>
+            </div>
           </section>
         ) : (
           <div className="cart-layout">
@@ -395,6 +409,9 @@ export default function CartPage() {
                             +
                           </button>
                         </div>
+                        {quantityErrors[item.productId] && (
+                          <small className="cart-field-error">{quantityErrors[item.productId]}</small>
+                        )}
 
                         <button
                           type="button"

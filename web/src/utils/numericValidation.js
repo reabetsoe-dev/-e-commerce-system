@@ -1,4 +1,4 @@
-export const INVALID_NUMERIC_INPUT_MESSAGE = "Invalid input for letters";
+export const INVALID_NUMERIC_INPUT_MESSAGE = "Invalid input.";
 
 const PATTERNS = {
   digits: /^\d*$/,
