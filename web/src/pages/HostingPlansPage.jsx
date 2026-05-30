@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import MessageDialog from "../components/MessageDialog";
 import PageHeader from "../components/PageHeader";
+import api from "../api/client";
 import { useCart } from "../context/CartContext";
 import { formatMoney } from "../utils/currency";
 
@@ -14,9 +15,8 @@ export default function HostingPlansPage() {
   useEffect(() => {
     async function fetchPlans() {
       try {
-        const response = await fetch("http://localhost:4000/api/products/hosting-plans");
-        const data = await response.json();
-        setPlans(data.plans || []);
+        const response = await api.get("/products/hosting-plans");
+        setPlans(response.data.plans || []);
       } catch (fetchError) {
         setError("Failed to load hosting plans.");
       }

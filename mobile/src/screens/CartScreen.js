@@ -205,7 +205,7 @@ export default function CartScreen() {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0644ca" />
+        <ActivityIndicator size="large" color="#03d9ff" />
       </View>
     );
   }
@@ -224,6 +224,9 @@ export default function CartScreen() {
         <View style={styles.emptyBox}>
           <Text style={styles.emptyText}>Your cart is empty</Text>
           <Text style={styles.emptySub}>Add products from the Products tab to begin.</Text>
+          <Pressable style={styles.checkoutBtn} onPress={() => navigation.navigate("Products")}>
+            <Text style={styles.checkoutBtnText}>Explore Catalog</Text>
+          </Pressable>
         </View>
       ) : (
         <>
@@ -375,89 +378,90 @@ function SummaryLine({ label, value, total }) {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#f4f8fb"
+    backgroundColor: "#020817"
   },
   content: {
-    padding: 12,
+    padding: 14,
     paddingBottom: 28,
-    gap: 10
+    gap: 12
   },
   centered: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f4f8fb"
+    backgroundColor: "#020817"
   },
   error: {
-    color: "#b2353b",
-    backgroundColor: "#fceced",
+    color: "#ff8aa0",
+    backgroundColor: "rgba(255,107,133,0.12)",
     borderWidth: 1,
-    borderColor: "#f4c9cb",
+    borderColor: "rgba(255,107,133,0.34)",
     borderRadius: 10,
     padding: 10,
     fontWeight: "700"
   },
   status: {
-    color: "#1e7d52",
-    backgroundColor: "#eaf9f0",
+    color: "#20f2a3",
+    backgroundColor: "rgba(32,242,163,0.1)",
     borderWidth: 1,
-    borderColor: "#c4e9d2",
+    borderColor: "rgba(32,242,163,0.28)",
     borderRadius: 10,
     padding: 10,
     fontWeight: "700"
   },
   emptyBox: {
     borderWidth: 1,
-    borderColor: "#dce8f1",
-    borderRadius: 20,
-    backgroundColor: "#fff",
-    padding: 16
+    borderColor: "rgba(0,166,255,0.24)",
+    borderRadius: 16,
+    backgroundColor: "#06152b",
+    padding: 18,
+    gap: 10
   },
   emptyText: {
-    color: "#15374a",
+    color: "#edf8ff",
     fontWeight: "900",
-    fontSize: 18
+    fontSize: 22
   },
   emptySub: {
-    color: "#5c7381",
+    color: "#8ea7c4",
     marginTop: 4
   },
   itemsPanel: {
     borderWidth: 1,
-    borderColor: "#dce8f1",
-    borderRadius: 20,
-    backgroundColor: "#fff",
+    borderColor: "rgba(0,166,255,0.24)",
+    borderRadius: 16,
+    backgroundColor: "#06152b",
     padding: 12,
     gap: 10
   },
   summaryPanel: {
     borderWidth: 1,
-    borderColor: "#dce8f1",
-    borderRadius: 20,
-    backgroundColor: "#fff",
+    borderColor: "rgba(0,166,255,0.24)",
+    borderRadius: 16,
+    backgroundColor: "#06152b",
     padding: 14,
     gap: 9
   },
   sectionTitle: {
-    color: "#12384b",
+    color: "#edf8ff",
     fontSize: 20,
     fontWeight: "900"
   },
   itemCard: {
     borderWidth: 1,
-    borderColor: "#e2eaf3",
-    borderRadius: 16,
+    borderColor: "rgba(0,166,255,0.18)",
+    borderRadius: 14,
     padding: 10,
     gap: 9,
-    backgroundColor: "#fff"
+    backgroundColor: "#071b33"
   },
   itemImage: {
     width: "100%",
     height: 150,
     borderRadius: 14,
-    backgroundColor: "#f7fbff",
+    backgroundColor: "#0b1f3d",
     borderWidth: 1,
-    borderColor: "#e7eef7"
+    borderColor: "rgba(0,166,255,0.18)"
   },
   itemInfo: {
     gap: 3
@@ -465,10 +469,10 @@ const styles = StyleSheet.create({
   itemTitle: {
     fontSize: 17,
     fontWeight: "900",
-    color: "#173b4c"
+    color: "#edf8ff"
   },
   itemMeta: {
-    color: "#5a7081"
+    color: "#8ea7c4"
   },
   itemActions: {
     flexDirection: "row",
@@ -485,14 +489,14 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 9,
-    backgroundColor: "#e6f6f2",
+    backgroundColor: "rgba(0,217,255,0.08)",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#c3ddd7"
+    borderColor: "rgba(0,217,255,0.28)"
   },
   qtyBtnText: {
-    color: "#0e706e",
+    color: "#03d9ff",
     fontWeight: "900",
     fontSize: 18
   },
@@ -500,16 +504,18 @@ const styles = StyleSheet.create({
     minWidth: 22,
     textAlign: "center",
     fontWeight: "900",
-    color: "#1d3e50"
+    color: "#edf8ff"
   },
   removeBtn: {
-    backgroundColor: "#c73f45",
+    backgroundColor: "rgba(255,107,133,0.16)",
+    borderWidth: 1,
+    borderColor: "rgba(255,107,133,0.36)",
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8
   },
   removeBtnText: {
-    color: "#fff",
+    color: "#ff8aa0",
     fontWeight: "900"
   },
   summaryLine: {
@@ -518,26 +524,26 @@ const styles = StyleSheet.create({
     gap: 12
   },
   summaryLabel: {
-    color: "#5f7380",
+    color: "#8ea7c4",
     fontWeight: "800"
   },
   summaryValue: {
-    color: "#07142a",
+    color: "#edf8ff",
     fontWeight: "900"
   },
   totalLine: {
     borderTopWidth: 1,
-    borderTopColor: "#d8e5e1",
+    borderTopColor: "rgba(0,166,255,0.24)",
     paddingTop: 10,
     marginTop: 2
   },
   totalText: {
-    color: "#0b5f5c",
+    color: "#20f2a3",
     fontSize: 18,
     fontWeight: "900"
   },
   label: {
-    color: "#24404c",
+    color: "#c3d2e4",
     fontWeight: "900",
     marginTop: 4
   },
@@ -550,17 +556,17 @@ const styles = StyleSheet.create({
     width: "31%",
     minWidth: 96,
     borderWidth: 1,
-    borderColor: "#c8deda",
+    borderColor: "rgba(0,166,255,0.28)",
     borderRadius: 12,
     paddingHorizontal: 8,
     paddingVertical: 10,
     alignItems: "center",
     gap: 6,
-    backgroundColor: "#fff"
+    backgroundColor: "#071b33"
   },
   paymentCardActive: {
-    borderColor: "#0644ca",
-    backgroundColor: "#eef4ff"
+    borderColor: "#03d9ff",
+    backgroundColor: "rgba(0,217,255,0.12)"
   },
   paymentIcon: {
     width: 58,
@@ -569,13 +575,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff"
   },
   paymentChipText: {
-    color: "#173240",
+    color: "#c3d2e4",
     fontWeight: "800",
     fontSize: 12,
     textAlign: "center"
   },
   paymentChipTextActive: {
-    color: "#0644ca"
+    color: "#03d9ff"
   },
   paymentFields: {
     gap: 8
@@ -583,36 +589,36 @@ const styles = StyleSheet.create({
   paymentInput: {
     minHeight: 48,
     borderWidth: 1,
-    borderColor: "#c8deda",
+    borderColor: "rgba(0,166,255,0.28)",
     borderRadius: 12,
     paddingHorizontal: 12,
-    color: "#173240",
+    color: "#edf8ff",
     fontWeight: "800",
-    backgroundColor: "#fff"
+    backgroundColor: "#071b33"
   },
   paymentTotalBox: {
     minHeight: 54,
     borderWidth: 1,
-    borderColor: "#c8deda",
+    borderColor: "rgba(0,166,255,0.28)",
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
     justifyContent: "center",
-    backgroundColor: "#f6fbff"
+    backgroundColor: "#071b33"
   },
   paymentTotalLabel: {
-    color: "#5f7380",
+    color: "#8ea7c4",
     fontSize: 12,
     fontWeight: "800",
     textTransform: "uppercase"
   },
   paymentTotalValue: {
-    color: "#0b5f5c",
+    color: "#20f2a3",
     fontSize: 17,
     fontWeight: "900"
   },
   checkoutBtn: {
-    backgroundColor: "#0644ca",
+    backgroundColor: "#149dff",
     borderRadius: 12,
     paddingVertical: 13,
     alignItems: "center",

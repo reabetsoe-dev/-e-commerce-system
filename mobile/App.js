@@ -22,6 +22,17 @@ import { ShopProvider, useShop } from "./src/context/ShopContext";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+const COLORS = {
+  bg: "#020817",
+  panel: "#06152b",
+  panelAlt: "#071b33",
+  line: "rgba(0,166,255,0.24)",
+  blue: "#149dff",
+  cyan: "#03d9ff",
+  green: "#20f2a3",
+  text: "#edf8ff",
+  muted: "#8ea7c4"
+};
 const TAB_ICONS = {
   Products: ["storefront", "storefront-outline"],
   Hosting: ["server", "server-outline"],
@@ -39,11 +50,11 @@ function LoadingScreen() {
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: "#f4f8fb"
+        backgroundColor: COLORS.bg
       }}
     >
-      <ActivityIndicator size="large" color="#0644ca" />
-      <Text style={{ marginTop: 12, color: "#10264a", fontWeight: "900" }}>Loading...</Text>
+      <ActivityIndicator size="large" color={COLORS.cyan} />
+      <Text style={{ marginTop: 12, color: COLORS.text, fontWeight: "900" }}>Loading...</Text>
     </View>
   );
 }
@@ -58,27 +69,27 @@ function AppTabs() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerStyle: {
-          backgroundColor: "#ffffff"
+          backgroundColor: COLORS.bg
         },
         headerTitleStyle: {
-          color: "#081327",
+          color: COLORS.text,
           fontWeight: "900"
         },
-        headerTintColor: "#0644ca",
+        headerTintColor: COLORS.cyan,
         headerShadowVisible: false,
-        sceneStyle: { backgroundColor: "#f4f8fb" },
-        tabBarActiveTintColor: "#0644ca",
-        tabBarInactiveTintColor: "#6b7f89",
+        sceneStyle: { backgroundColor: COLORS.bg },
+        tabBarActiveTintColor: COLORS.cyan,
+        tabBarInactiveTintColor: COLORS.muted,
         tabBarStyle: {
-          backgroundColor: "#ffffff",
-          borderTopColor: "#dce8f1",
+          backgroundColor: COLORS.panel,
+          borderTopColor: COLORS.line,
           borderTopWidth: 1,
           height: 72,
           paddingBottom: 10,
           paddingTop: 8,
-          shadowColor: "#0b376b",
-          shadowOpacity: 0.12,
-          shadowRadius: 16,
+          shadowColor: "#000",
+          shadowOpacity: 0.34,
+          shadowRadius: 20,
           shadowOffset: { width: 0, height: -4 },
           elevation: 12
         },
@@ -87,7 +98,7 @@ function AppTabs() {
           fontWeight: "900"
         },
         tabBarBadgeStyle: {
-          backgroundColor: "#0644ca",
+          backgroundColor: COLORS.blue,
           color: "#fff",
           fontWeight: "900"
         },

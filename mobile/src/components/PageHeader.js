@@ -42,40 +42,45 @@ const styles = StyleSheet.create({
     marginBottom: 10
   },
   backButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#dce8f1",
+    borderColor: "rgba(0,217,255,0.28)",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#fff",
-    shadowColor: "#0b376b",
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
+    backgroundColor: "rgba(3,217,255,0.08)",
+    shadowColor: "#03d9ff",
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
     elevation: 2
   },
   backText: {
-    color: "#0644ca",
+    color: "#03d9ff",
     fontSize: 22,
     fontWeight: "900"
   },
   crumb: {
     flex: 1,
-    color: "#10264a",
+    color: "#8ea7c4",
     fontWeight: "900"
   },
   hero: {
     position: "relative",
     overflow: "hidden",
-    borderRadius: 24,
-    backgroundColor: "#0e7a78",
+    borderRadius: 16,
+    backgroundColor: "#06152b",
     padding: 18,
     marginBottom: 12,
     minHeight: 142,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.36)"
+    borderColor: "rgba(0,217,255,0.26)",
+    shadowColor: "#000",
+    shadowOpacity: 0.24,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 5
   },
   heroAccent: {
     position: "absolute",
@@ -84,8 +89,8 @@ const styles = StyleSheet.create({
     width: 230,
     height: 230,
     borderRadius: 115,
-    backgroundColor: "#188fc0",
-    opacity: 0.65
+    backgroundColor: "#03d9ff",
+    opacity: 0.18
   },
   heroCircle: {
     position: "absolute",
@@ -94,8 +99,8 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     borderRadius: 100,
-    backgroundColor: "#0b376b",
-    opacity: 0.5
+    backgroundColor: "#145cff",
+    opacity: 0.28
   },
   heroSmallCircle: {
     position: "absolute",
@@ -104,13 +109,13 @@ const styles = StyleSheet.create({
     width: 66,
     height: 66,
     borderRadius: 33,
-    backgroundColor: "rgba(255,255,255,0.12)"
+    backgroundColor: "rgba(32,242,163,0.12)"
   },
   eyebrow: {
     alignSelf: "flex-start",
     borderRadius: 999,
-    backgroundColor: "rgba(255,255,255,0.16)",
-    color: "rgba(255,255,255,0.92)",
+    backgroundColor: "rgba(0,217,255,0.12)",
+    color: "#20f2a3",
     paddingHorizontal: 10,
     paddingVertical: 5,
     marginBottom: 9,
@@ -126,7 +131,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.4
   },
   subtitle: {
-    color: "rgba(255,255,255,0.88)",
+    color: "#c3d2e4",
     marginTop: 7,
     lineHeight: 20,
     fontWeight: "700"

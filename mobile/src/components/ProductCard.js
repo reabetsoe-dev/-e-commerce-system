@@ -81,25 +81,25 @@ export default function ProductCard({
 const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
-    borderColor: "#dce8f1",
-    borderRadius: 20,
-    backgroundColor: "#fff",
+    borderColor: "rgba(0,166,255,0.24)",
+    borderRadius: 16,
+    backgroundColor: "#06152b",
     overflow: "hidden",
-    shadowColor: "#0b376b",
-    shadowOpacity: 0.09,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 3
+    shadowColor: "#000",
+    shadowOpacity: 0.28,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 5
   },
   imageFrame: {
     height: 206,
     margin: 12,
     marginBottom: 0,
-    borderRadius: 16,
+    borderRadius: 12,
     overflow: "hidden",
-    backgroundColor: "#f7fbff",
+    backgroundColor: "#071b33",
     borderWidth: 1,
-    borderColor: "#e7eef7"
+    borderColor: "rgba(0,166,255,0.2)"
   },
   image: {
     width: "100%",
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   imageFallbackText: {
-    color: "#637486",
+    color: "#8ea7c4",
     fontWeight: "800"
   },
   wishlist: {
@@ -124,17 +124,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 10,
-    backgroundColor: "rgba(255,255,255,0.92)",
+    backgroundColor: "rgba(2,8,23,0.82)",
     borderWidth: 1,
-    borderColor: "rgba(6,68,202,0.12)"
+    borderColor: "rgba(0,217,255,0.28)"
   },
   wishlistText: {
-    color: "#51637d",
+    color: "#c3d2e4",
     fontSize: 12,
     fontWeight: "900"
   },
   wishlistActive: {
-    color: "#c4373a"
+    color: "#20f2a3"
   },
   body: {
     padding: 14,
@@ -142,8 +142,8 @@ const styles = StyleSheet.create({
   },
   category: {
     alignSelf: "flex-start",
-    backgroundColor: "#eef4ff",
-    color: "#0644ca",
+    backgroundColor: "rgba(0,217,255,0.12)",
+    color: "#03d9ff",
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 999,
@@ -154,17 +154,17 @@ const styles = StyleSheet.create({
     minHeight: 44,
     fontSize: 19,
     fontWeight: "900",
-    color: "#07142a"
+    color: "#edf8ff"
   },
   description: {
-    color: "#5d7380",
+    color: "#8ea7c4",
     lineHeight: 19
   },
   priceRow: {
     gap: 4
   },
   price: {
-    color: "#081b42",
+    color: "#20f2a3",
     fontWeight: "900",
     fontSize: 18
   },
@@ -174,21 +174,21 @@ const styles = StyleSheet.create({
     gap: 8
   },
   oldPrice: {
-    color: "#82919e",
+    color: "#6f86a4",
     textDecorationLine: "line-through",
     fontWeight: "700"
   },
   discountText: {
     borderRadius: 4,
-    backgroundColor: "#ffe9e9",
-    color: "#d73535",
+    backgroundColor: "rgba(255,107,133,0.14)",
+    color: "#ff6b85",
     paddingHorizontal: 6,
     paddingVertical: 2,
     fontSize: 11,
     fontWeight: "900"
   },
   stock: {
-    color: "#5b7080",
+    color: "#8ea7c4",
     fontWeight: "700"
   },
   actionRow: {
@@ -198,20 +198,20 @@ const styles = StyleSheet.create({
   lightButton: {
     flex: 1,
     borderRadius: 12,
-    backgroundColor: "#f5f8ff",
+    backgroundColor: "rgba(0,217,255,0.05)",
     paddingVertical: 13,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#d8e5ff"
+    borderColor: "rgba(0,217,255,0.34)"
   },
   lightButtonText: {
-    color: "#0644ca",
+    color: "#03d9ff",
     fontWeight: "900"
   },
   addButton: {
     flex: 1.25,
     borderRadius: 12,
-    backgroundColor: "#0644ca",
+    backgroundColor: "#149dff",
     paddingVertical: 13,
     alignItems: "center"
   },
