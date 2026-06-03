@@ -122,7 +122,7 @@ function NavButton({ label, onPress }) {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#020817"
+    backgroundColor: "#f5f8fb"
   },
   content: {
     padding: 12,
@@ -131,41 +131,41 @@ const styles = StyleSheet.create({
   },
   card: {
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.24)",
-    borderRadius: 16,
-    backgroundColor: "#06152b",
+    borderColor: "#dce8f1",
+    borderRadius: 12,
+    backgroundColor: "#fff",
     padding: 14,
     gap: 8
   },
   sectionTitle: {
-    color: "#edf8ff",
+    color: "#12384b",
     fontSize: 18,
     fontWeight: "900"
   },
   label: {
-    color: "#8ea7c4",
+    color: "#5f7280",
     fontSize: 12,
     fontWeight: "900",
     textTransform: "uppercase",
     marginTop: 4
   },
   value: {
-    color: "#edf8ff",
+    color: "#163a4c",
     fontWeight: "800"
   },
   input: {
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.28)",
+    borderColor: "#ccddda",
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: "#071b33",
-    color: "#edf8ff",
+    backgroundColor: "#fff",
+    color: "#163a4c",
     fontWeight: "800"
   },
   disabledInput: {
-    color: "#8ea7c4",
-    backgroundColor: "#071b33"
+    color: "#607582",
+    backgroundColor: "#f5f8f7"
   },
   passwordRow: {
     flexDirection: "row",
@@ -178,18 +178,18 @@ const styles = StyleSheet.create({
   passwordToggle: {
     width: 70,
     borderWidth: 1,
-    borderColor: "rgba(0,217,255,0.3)",
+    borderColor: "#d8e5ff",
     borderRadius: 12,
-    backgroundColor: "rgba(0,217,255,0.06)",
+    backgroundColor: "#f5f8ff",
     alignItems: "center",
     justifyContent: "center"
   },
   passwordToggleText: {
-    color: "#03d9ff",
+    color: "#0644ca",
     fontWeight: "900"
   },
   primaryButton: {
-    backgroundColor: "#149dff",
+    backgroundColor: "#0644ca",
     borderRadius: 12,
     alignItems: "center",
     paddingVertical: 12,
@@ -201,14 +201,14 @@ const styles = StyleSheet.create({
   },
   navButton: {
     borderWidth: 1,
-    borderColor: "rgba(0,217,255,0.3)",
-    backgroundColor: "#071b33",
+    borderColor: "#c8deda",
+    backgroundColor: "#f2f8f6",
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 12
   },
   navButtonText: {
-    color: "#edf8ff",
+    color: "#173240",
     fontWeight: "900"
   },
   logoutBtn: {

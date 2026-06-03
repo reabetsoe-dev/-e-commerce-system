@@ -87,7 +87,7 @@ export default function WishlistScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#020817"
+    backgroundColor: "#f5f8fb"
   },
   content: {
     padding: 14,
@@ -105,18 +105,18 @@ const styles = StyleSheet.create({
   },
   empty: {
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.24)",
-    borderRadius: 16,
-    backgroundColor: "#06152b",
+    borderColor: "#dce8f1",
+    borderRadius: 12,
+    backgroundColor: "#fff",
     padding: 16
   },
   emptyTitle: {
-    color: "#edf8ff",
+    color: "#15384b",
     fontSize: 18,
     fontWeight: "900"
   },
   emptyText: {
-    color: "#8ea7c4",
+    color: "#5f7480",
     marginTop: 4
   }
 });

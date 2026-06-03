@@ -18,10 +18,17 @@ export default function ProductCard({
   const isOutOfStock = !isService && Number(product.stock || 0) <= 0;
   const imageUrl = resolveAssetUrl(product.imageUrl || product.imagePath);
   const brand = product.brand || product.provider;
+  const availability = product.availabilityStatus || (isOutOfStock ? "Out of Stock" : "In Stock");
 
   return (
     <View style={styles.card}>
-      <View style={styles.imageFrame}>
+      <Pressable style={[styles.wishlist, wishlisted && styles.wishlistActiveButton]} onPress={() => onWishlist?.(product.id)}>
+        <Text style={[styles.wishlistText, wishlisted && styles.wishlistActiveText]}>
+          {wishlisted ? "♥" : "♡"}
+        </Text>
+      </Pressable>
+
+      <Pressable style={styles.imageFrame} onPress={() => onDetails?.(product)}>
         {imageUrl ? (
           <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="contain" />
         ) : (
@@ -29,23 +36,16 @@ export default function ProductCard({
             <Text style={styles.imageFallbackText}>No image</Text>
           </View>
         )}
-        <Pressable style={styles.wishlist} onPress={() => onWishlist?.(product.id)}>
-          <Text style={[styles.wishlistText, wishlisted && styles.wishlistActive]}>
-            {wishlisted ? "Saved" : "Save"}
-          </Text>
-        </Pressable>
-      </View>
+      </Pressable>
 
       <View style={styles.body}>
-        <Text style={styles.category}>
-          {brand ? `${product.category} / ${brand}` : product.category}
-        </Text>
         <Text style={styles.title} numberOfLines={2}>
           {product.name}
         </Text>
-        <Text style={styles.description} numberOfLines={2}>
-          {product.description || product.subcategory}
-        </Text>
+        <View style={styles.metaRow}>
+          {brand ? <Text style={styles.metaPill}>{brand}</Text> : null}
+          <Text style={[styles.metaPill, isOutOfStock && styles.metaPillDanger]}>{availability}</Text>
+        </View>
 
         <View style={styles.priceRow}>
           <Text style={styles.price}>{formatMoney(discountedPrice)}</Text>
@@ -57,22 +57,18 @@ export default function ProductCard({
           ) : null}
         </View>
 
-        <Text style={styles.stock}>{isService ? "Service item" : `Stock: ${product.stock}`}</Text>
-
-        <View style={styles.actionRow}>
-          <Pressable style={styles.lightButton} onPress={() => onDetails?.(product)}>
-            <Text style={styles.lightButtonText}>Details</Text>
-          </Pressable>
-          <Pressable
-            style={[styles.addButton, (busy || isOutOfStock) && styles.disabled]}
-            onPress={() => onAddToCart?.(product.id)}
-            disabled={busy || isOutOfStock}
-          >
-            <Text style={styles.addButtonText}>
-              {busy ? "Adding..." : isOutOfStock ? "Out of Stock" : "Add to Cart"}
-            </Text>
-          </Pressable>
-        </View>
+        <Pressable style={styles.detailsButton} onPress={() => onDetails?.(product)}>
+          <Text style={styles.detailsButtonText}>Details</Text>
+        </Pressable>
+        <Pressable
+          style={[styles.addButton, (busy || isOutOfStock) && styles.disabled]}
+          onPress={() => onAddToCart?.(product.id)}
+          disabled={busy || isOutOfStock}
+        >
+          <Text style={styles.addButtonText}>
+            {busy ? "Adding..." : isOutOfStock ? "Out of Stock" : "Add to Cart"}
+          </Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -81,25 +77,25 @@ export default function ProductCard({
 const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.24)",
-    borderRadius: 16,
-    backgroundColor: "#06152b",
+    borderColor: "#e4e9f1",
+    borderRadius: 8,
+    backgroundColor: "#fff",
     overflow: "hidden",
-    shadowColor: "#000",
-    shadowOpacity: 0.28,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 12 },
-    elevation: 5
+    shadowColor: "#0f172a",
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 3
   },
   imageFrame: {
     height: 206,
     margin: 12,
     marginBottom: 0,
-    borderRadius: 12,
+    borderRadius: 8,
     overflow: "hidden",
-    backgroundColor: "#071b33",
+    backgroundColor: "#f7fbff",
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.2)"
+    borderColor: "#e7eef7"
   },
   image: {
     width: "100%",
@@ -111,30 +107,39 @@ const styles = StyleSheet.create({
     justifyContent: "center"
   },
   imageFallbackText: {
-    color: "#8ea7c4",
+    color: "#6b7789",
     fontWeight: "800"
   },
   wishlist: {
     position: "absolute",
-    top: 8,
-    right: 8,
-    minWidth: 58,
-    height: 34,
-    borderRadius: 17,
+    top: 14,
+    right: 14,
+    zIndex: 2,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 10,
-    backgroundColor: "rgba(2,8,23,0.82)",
+    backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "rgba(0,217,255,0.28)"
+    borderColor: "#dfe7f2",
+    shadowColor: "#0f172a",
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 4
+  },
+  wishlistActiveButton: {
+    borderColor: "#ffb3c0",
+    backgroundColor: "#fff3f5"
   },
   wishlistText: {
-    color: "#c3d2e4",
-    fontSize: 12,
+    color: "#738198",
+    fontSize: 22,
     fontWeight: "900"
   },
-  wishlistActive: {
-    color: "#20f2a3"
+  wishlistActiveText: {
+    color: "#f03e3e"
   },
   body: {
     padding: 14,
@@ -154,19 +159,33 @@ const styles = StyleSheet.create({
     minHeight: 44,
     fontSize: 19,
     fontWeight: "900",
-    color: "#edf8ff"
+    color: "#07142a"
   },
-  description: {
-    color: "#8ea7c4",
-    lineHeight: 19
+  metaRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6
+  },
+  metaPill: {
+    color: "#5b6d83",
+    backgroundColor: "#f3f7fb",
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    fontSize: 12,
+    fontWeight: "800"
+  },
+  metaPillDanger: {
+    color: "#c92a2a",
+    backgroundColor: "#fff0f0"
   },
   priceRow: {
     gap: 4
   },
   price: {
-    color: "#20f2a3",
+    color: "#07142a",
     fontWeight: "900",
-    fontSize: 18
+    fontSize: 20
   },
   discount: {
     flexDirection: "row",
@@ -174,44 +193,34 @@ const styles = StyleSheet.create({
     gap: 8
   },
   oldPrice: {
-    color: "#6f86a4",
+    color: "#8b98aa",
     textDecorationLine: "line-through",
     fontWeight: "700"
   },
   discountText: {
     borderRadius: 4,
-    backgroundColor: "rgba(255,107,133,0.14)",
-    color: "#ff6b85",
+    backgroundColor: "#ffe9e9",
+    color: "#c92a2a",
     paddingHorizontal: 6,
     paddingVertical: 2,
     fontSize: 11,
     fontWeight: "900"
   },
-  stock: {
-    color: "#8ea7c4",
-    fontWeight: "700"
-  },
-  actionRow: {
-    flexDirection: "row",
-    gap: 8
-  },
-  lightButton: {
-    flex: 1,
-    borderRadius: 12,
-    backgroundColor: "rgba(0,217,255,0.05)",
-    paddingVertical: 13,
+  detailsButton: {
+    borderRadius: 8,
+    backgroundColor: "#f8fbff",
+    paddingVertical: 11,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "rgba(0,217,255,0.34)"
+    borderColor: "#dce6f0"
   },
-  lightButtonText: {
-    color: "#03d9ff",
+  detailsButtonText: {
+    color: "#0644ca",
     fontWeight: "900"
   },
   addButton: {
-    flex: 1.25,
-    borderRadius: 12,
-    backgroundColor: "#149dff",
+    borderRadius: 8,
+    backgroundColor: "#0644ca",
     paddingVertical: 13,
     alignItems: "center"
   },

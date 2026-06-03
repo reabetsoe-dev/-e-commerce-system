@@ -58,7 +58,7 @@ export default function HomeScreen() {
                 style={styles.userChip}
                 onPress={() => navigation.navigate(isAdmin ? "Admin" : "Profile")}
               >
-                <Ionicons name="person-circle-outline" size={18} color="#03d9ff" />
+                <Ionicons name="person-circle-outline" size={18} color="#0644ca" />
                 <Text style={styles.userChipText} numberOfLines={1}>
                   Hi, {user.name}
                 </Text>
@@ -119,19 +119,19 @@ export default function HomeScreen() {
               key={item.screen}
               onPress={() => navigation.navigate(item.screen)}
             >
-              <Ionicons name={item.icon} size={20} color="#03d9ff" />
+              <Ionicons name={item.icon} size={20} color="#0644ca" />
               <Text style={styles.linkButtonText}>{item.label}</Text>
             </Pressable>
           ))}
           {user && !isAdmin ? (
             <Pressable style={styles.linkButton} onPress={() => navigation.navigate("Wishlist")}>
-              <Ionicons name="heart-outline" size={20} color="#03d9ff" />
+              <Ionicons name="heart-outline" size={20} color="#0644ca" />
               <Text style={styles.linkButtonText}>Wishlist</Text>
             </Pressable>
           ) : null}
           {isAdmin ? (
             <Pressable style={styles.linkButton} onPress={() => navigation.navigate("Admin")}>
-              <Ionicons name="shield-checkmark-outline" size={20} color="#03d9ff" />
+              <Ionicons name="shield-checkmark-outline" size={20} color="#0644ca" />
               <Text style={styles.linkButtonText}>Admin</Text>
             </Pressable>
           ) : null}
@@ -144,7 +144,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#020817"
+    backgroundColor: "#f5f8fb"
   },
   content: {
     padding: 14,
@@ -153,16 +153,16 @@ const styles = StyleSheet.create({
   },
   hero: {
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.24)",
-    borderRadius: 16,
-    backgroundColor: "#06152b",
+    borderColor: "#dbe5ef",
+    borderRadius: 18,
+    backgroundColor: "#fff",
     overflow: "hidden"
   },
   heroHeader: {
     padding: 14,
     gap: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "rgba(0,166,255,0.18)"
+    borderBottomColor: "#edf2f7"
   },
   logo: {
     flexDirection: "row",
@@ -184,25 +184,27 @@ const styles = StyleSheet.create({
     flex: 1
   },
   logoTitle: {
-    color: "#edf8ff",
+    color: "#07142a",
     fontSize: 16,
     fontWeight: "900"
   },
   logoSub: {
-    color: "#8ea7c4",
+    color: "#53647c",
     fontSize: 12,
     fontWeight: "700"
   },
   headerButton: {
     minHeight: 42,
-    borderRadius: 12,
+    borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#149dff",
+    backgroundColor: "#f8fbff",
+    borderWidth: 1,
+    borderColor: "#dce6f0",
     paddingHorizontal: 14
   },
   headerButtonText: {
-    color: "#fff",
+    color: "#07142a",
     fontWeight: "900"
   },
   userActions: {
@@ -214,8 +216,8 @@ const styles = StyleSheet.create({
     minHeight: 42,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "rgba(0,217,255,0.3)",
-    backgroundColor: "#071b33",
+    borderColor: "#dce6f0",
+    backgroundColor: "#f8fbff",
     paddingHorizontal: 12,
     flexDirection: "row",
     alignItems: "center",
@@ -223,7 +225,7 @@ const styles = StyleSheet.create({
   },
   userChipText: {
     flex: 1,
-    color: "#edf8ff",
+    color: "#07142a",
     fontWeight: "900"
   },
   logoutButton: {
@@ -238,10 +240,14 @@ const styles = StyleSheet.create({
   },
   heroBody: {
     gap: 12,
-    padding: 14
+    padding: 14,
+    backgroundColor: "#fff"
   },
   heroCopy: {
-    gap: 11
+    gap: 11,
+    borderRadius: 12,
+    padding: 16,
+    backgroundColor: "#061333"
   },
   heroTitle: {
     color: "#fff",
@@ -262,8 +268,8 @@ const styles = StyleSheet.create({
   primaryButton: {
     flex: 1.2,
     minHeight: 48,
-    borderRadius: 12,
-    backgroundColor: "#149dff",
+    borderRadius: 8,
+    backgroundColor: "#0644ca",
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
@@ -276,10 +282,10 @@ const styles = StyleSheet.create({
   secondaryButton: {
     flex: 1,
     minHeight: 48,
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: "rgba(0,217,255,0.32)",
-    backgroundColor: "rgba(0,217,255,0.06)",
+    borderColor: "rgba(42,177,255,0.5)",
+    backgroundColor: "rgba(255,255,255,0.06)",
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
@@ -292,8 +298,8 @@ const styles = StyleSheet.create({
   heroImage: {
     width: "100%",
     height: 210,
-    borderRadius: 14,
-    backgroundColor: "#071b33"
+    borderRadius: 12,
+    backgroundColor: "#eef3f8"
   },
   trustGrid: {
     gap: 10
@@ -301,9 +307,9 @@ const styles = StyleSheet.create({
   trustCard: {
     minHeight: 72,
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.24)",
-    borderRadius: 14,
-    backgroundColor: "#06152b",
+    borderColor: "#e3e9f3",
+    borderRadius: 12,
+    backgroundColor: "#fff",
     padding: 12,
     flexDirection: "row",
     alignItems: "center",
@@ -321,23 +327,23 @@ const styles = StyleSheet.create({
     flex: 1
   },
   trustTitle: {
-    color: "#edf8ff",
+    color: "#07142a",
     fontWeight: "900"
   },
   trustText: {
-    color: "#8ea7c4",
+    color: "#53647c",
     marginTop: 2
   },
   linkPanel: {
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.24)",
-    borderRadius: 16,
-    backgroundColor: "#06152b",
+    borderColor: "#e3e9f3",
+    borderRadius: 12,
+    backgroundColor: "#fff",
     padding: 14,
     gap: 12
   },
   sectionTitle: {
-    color: "#edf8ff",
+    color: "#07142a",
     fontSize: 18,
     fontWeight: "900"
   },
@@ -352,15 +358,15 @@ const styles = StyleSheet.create({
     minHeight: 48,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: "rgba(0,217,255,0.26)",
-    backgroundColor: "#071b33",
+    borderColor: "#dce6f0",
+    backgroundColor: "#f8fbff",
     paddingHorizontal: 12,
     flexDirection: "row",
     alignItems: "center",
     gap: 8
   },
   linkButtonText: {
-    color: "#edf8ff",
+    color: "#07142a",
     fontWeight: "900"
   }
 });

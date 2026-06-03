@@ -97,7 +97,7 @@ export default function OrdersScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#020817"
+    backgroundColor: "#f5f8fb"
   },
   content: {
     padding: 14,
@@ -106,14 +106,14 @@ const styles = StyleSheet.create({
   },
   loadingInline: {
     borderRadius: 12,
-    backgroundColor: "#06152b",
+    backgroundColor: "#fff",
     padding: 14,
     flexDirection: "row",
     alignItems: "center",
     gap: 8
   },
   loadingText: {
-    color: "#c3d2e4",
+    color: "#174254",
     fontWeight: "800"
   },
   error: {
@@ -127,25 +127,25 @@ const styles = StyleSheet.create({
   },
   empty: {
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.24)",
-    borderRadius: 16,
-    backgroundColor: "#06152b",
+    borderColor: "#dce8f1",
+    borderRadius: 12,
+    backgroundColor: "#fff",
     padding: 16
   },
   emptyTitle: {
     fontWeight: "900",
-    color: "#edf8ff",
+    color: "#16394a",
     fontSize: 18
   },
   emptyText: {
-    color: "#8ea7c4",
+    color: "#5e7280",
     marginTop: 4
   },
   card: {
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.24)",
-    borderRadius: 16,
-    backgroundColor: "#06152b",
+    borderColor: "#dce8f1",
+    borderRadius: 12,
+    backgroundColor: "#fff",
     padding: 13,
     gap: 5
   },
@@ -158,25 +158,25 @@ const styles = StyleSheet.create({
   },
   orderId: {
     flex: 1,
-    color: "#edf8ff",
+    color: "#15384b",
     fontWeight: "900"
   },
   statusBadge: {
-    backgroundColor: "rgba(32,242,163,0.12)",
+    backgroundColor: "#e6f7f2",
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 4
   },
   statusText: {
-    color: "#20f2a3",
+    color: "#0e6f6d",
     fontWeight: "900",
     fontSize: 12
   },
   meta: {
-    color: "#8ea7c4"
+    color: "#5d7381"
   },
   linkText: {
-    color: "#03d9ff",
+    color: "#0644ca",
     fontWeight: "900",
     marginTop: 5
   }

@@ -290,37 +290,6 @@ export default function ProductsScreen() {
             />
 
             <View style={styles.panel}>
-              <View style={styles.panelHead}>
-                <Text style={styles.panelTitle}>Shop by Category</Text>
-                <Pressable onPress={clearFilters}>
-                  <Text style={styles.linkText}>View all</Text>
-                </Pressable>
-              </View>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
-                {SHOP_CATEGORIES.map((item) => (
-                  <Pressable
-                    key={item.category}
-                    style={[
-                      styles.categoryCard,
-                      filters.category === item.category && styles.categoryCardActive
-                    ]}
-                    onPress={() => updateFilters({ category: item.category }, true)}
-                  >
-                    <Image
-                      source={{ uri: resolveAssetUrl(item.imageUrl) }}
-                      style={styles.categoryImage}
-                      resizeMode="cover"
-                    />
-                    <Text style={styles.categoryTitle}>{item.title}</Text>
-                    <Text style={styles.categoryDescription} numberOfLines={2}>
-                      {item.description}
-                    </Text>
-                  </Pressable>
-                ))}
-              </ScrollView>
-            </View>
-
-            <View style={styles.panel}>
               <View style={styles.searchRow}>
                 <TextInput
                   style={[styles.input, styles.searchInput]}
@@ -339,7 +308,7 @@ export default function ProductsScreen() {
                   <Ionicons
                     name="options-outline"
                     size={21}
-                    color={sortMenuOpen ? "#ffffff" : "#03d9ff"}
+                    color={sortMenuOpen ? "#ffffff" : "#0644ca"}
                   />
                   <View style={styles.sortButtonCopy}>
                     <Text style={[styles.sortButtonText, sortMenuOpen && styles.sortButtonTextActive]}>
@@ -354,7 +323,7 @@ export default function ProductsScreen() {
                   <Ionicons
                     name={sortMenuOpen ? "chevron-up" : "chevron-down"}
                     size={16}
-                    color={sortMenuOpen ? "#ffffff" : "#8ea7c4"}
+                    color={sortMenuOpen ? "#ffffff" : "#6b7789"}
                   />
                 </Pressable>
               </View>
@@ -546,6 +515,37 @@ export default function ProductsScreen() {
               ) : null}
             </View>
 
+            <View style={styles.panel}>
+              <View style={styles.panelHead}>
+                <Text style={styles.panelTitle}>Shop by Category</Text>
+                <Pressable onPress={clearFilters}>
+                  <Text style={styles.linkText}>View all</Text>
+                </Pressable>
+              </View>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                {SHOP_CATEGORIES.map((item) => (
+                  <Pressable
+                    key={item.category}
+                    style={[
+                      styles.categoryCard,
+                      filters.category === item.category && styles.categoryCardActive
+                    ]}
+                    onPress={() => updateFilters({ category: item.category }, true)}
+                  >
+                    <Image
+                      source={{ uri: resolveAssetUrl(item.imageUrl) }}
+                      style={styles.categoryImage}
+                      resizeMode="cover"
+                    />
+                    <Text style={styles.categoryTitle}>{item.title}</Text>
+                    <Text style={styles.categoryDescription} numberOfLines={2}>
+                      {item.description}
+                    </Text>
+                  </Pressable>
+                ))}
+              </ScrollView>
+            </View>
+
             {error ? <Text style={styles.error}>{error}</Text> : null}
             {status ? <Text style={styles.status}>{status}</Text> : null}
             {loading ? (
@@ -582,7 +582,7 @@ export default function ProductsScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#020817"
+    backgroundColor: "#f5f8fb"
   },
   listContent: {
     padding: 14,
@@ -591,17 +591,17 @@ const styles = StyleSheet.create({
   },
   panel: {
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.24)",
-    borderRadius: 16,
-    backgroundColor: "#06152b",
+    borderColor: "#dce6f0",
+    borderRadius: 12,
+    backgroundColor: "#fff",
     padding: 14,
     gap: 10,
     marginBottom: 2,
-    shadowColor: "#000",
-    shadowOpacity: 0.24,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 5
+    shadowColor: "#0f172a",
+    shadowOpacity: 0.07,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 3
   },
   panelHead: {
     flexDirection: "row",
@@ -609,52 +609,52 @@ const styles = StyleSheet.create({
     alignItems: "center"
   },
   panelTitle: {
-    color: "#edf8ff",
+    color: "#07142a",
     fontSize: 18,
     fontWeight: "900"
   },
   linkText: {
-    color: "#03d9ff",
+    color: "#0644ca",
     fontWeight: "900"
   },
   categoryCard: {
     width: 224,
     minHeight: 176,
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.22)",
-    borderRadius: 14,
-    backgroundColor: "#071b33",
+    borderColor: "#e4e9f1",
+    borderRadius: 8,
+    backgroundColor: "#fff",
     padding: 10,
     gap: 6
   },
   categoryCardActive: {
-    borderColor: "#03d9ff",
-    backgroundColor: "rgba(0,217,255,0.1)"
+    borderColor: "#0644ca",
+    backgroundColor: "#f2f6ff"
   },
   categoryImage: {
     width: "100%",
     height: 92,
-    borderRadius: 14,
-    backgroundColor: "#0b1f3d"
+    borderRadius: 8,
+    backgroundColor: "#f7fbff"
   },
   categoryTitle: {
-    color: "#edf8ff",
+    color: "#07142a",
     fontWeight: "900",
     fontSize: 16
   },
   categoryDescription: {
-    color: "#8ea7c4",
+    color: "#53647c",
     lineHeight: 18
   },
   input: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.3)",
-    borderRadius: 10,
+    borderColor: "#cbdde0",
+    borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
-    backgroundColor: "#071b33",
-    color: "#edf8ff",
+    backgroundColor: "#fff",
+    color: "#07142a",
     fontWeight: "700"
   },
   searchRow: {
@@ -668,10 +668,10 @@ const styles = StyleSheet.create({
   sortButton: {
     width: 132,
     minHeight: 52,
-    borderRadius: 14,
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.3)",
-    backgroundColor: "#071b33",
+    borderColor: "#cbdde0",
+    backgroundColor: "#fff",
     paddingHorizontal: 10,
     flexDirection: "row",
     alignItems: "center",
@@ -679,14 +679,14 @@ const styles = StyleSheet.create({
     gap: 6
   },
   sortButtonActive: {
-    borderColor: "#03d9ff",
-    backgroundColor: "#149dff"
+    borderColor: "#0644ca",
+    backgroundColor: "#0644ca"
   },
   sortButtonCopy: {
     minWidth: 48
   },
   sortButtonText: {
-    color: "#edf8ff",
+    color: "#07142a",
     fontSize: 13,
     fontWeight: "900"
   },
@@ -694,7 +694,7 @@ const styles = StyleSheet.create({
     color: "#ffffff"
   },
   sortButtonMeta: {
-    color: "#8ea7c4",
+    color: "#6b7789",
     fontSize: 10,
     fontWeight: "900"
   },
@@ -703,7 +703,7 @@ const styles = StyleSheet.create({
   },
   filterMenu: {
     borderTopWidth: 1,
-    borderTopColor: "rgba(0,166,255,0.18)",
+    borderTopColor: "#e4e9f1",
     paddingTop: 12,
     gap: 10
   },
@@ -716,7 +716,7 @@ const styles = StyleSheet.create({
     paddingVertical: 2
   },
   filterTitle: {
-    color: "#c3d2e4",
+    color: "#53647c",
     fontSize: 12,
     fontWeight: "900",
     letterSpacing: 0.4,
@@ -724,23 +724,23 @@ const styles = StyleSheet.create({
   },
   chip: {
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.28)",
+    borderColor: "#dce6f0",
     borderRadius: 999,
     paddingHorizontal: 12,
     paddingVertical: 9,
-    backgroundColor: "#071b33"
+    backgroundColor: "#f8fbff"
   },
   chipActive: {
-    borderColor: "#03d9ff",
-    backgroundColor: "rgba(0,217,255,0.12)"
+    borderColor: "#0644ca",
+    backgroundColor: "#f2f6ff"
   },
   chipText: {
-    color: "#c3d2e4",
+    color: "#53647c",
     fontWeight: "800",
     textTransform: "capitalize"
   },
   chipTextActive: {
-    color: "#03d9ff"
+    color: "#0644ca"
   },
   buttonRow: {
     flexDirection: "row",
@@ -748,8 +748,8 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     flex: 1,
-    borderRadius: 12,
-    backgroundColor: "#149dff",
+    borderRadius: 8,
+    backgroundColor: "#0644ca",
     alignItems: "center",
     paddingVertical: 13
   },
@@ -759,15 +759,15 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     flex: 1,
-    borderRadius: 12,
-    backgroundColor: "rgba(0,217,255,0.05)",
+    borderRadius: 8,
+    backgroundColor: "#f8fbff",
     alignItems: "center",
     paddingVertical: 13,
     borderWidth: 1,
-    borderColor: "rgba(0,217,255,0.3)"
+    borderColor: "#dce6f0"
   },
   secondaryButtonText: {
-    color: "#c3d2e4",
+    color: "#0644ca",
     fontWeight: "900"
   },
   error: {
@@ -790,30 +790,30 @@ const styles = StyleSheet.create({
   },
   loadingInline: {
     borderRadius: 12,
-    backgroundColor: "#06152b",
+    backgroundColor: "#fff",
     padding: 14,
     flexDirection: "row",
     alignItems: "center",
     gap: 8
   },
   loadingText: {
-    color: "#c3d2e4",
+    color: "#53647c",
     fontWeight: "800"
   },
   empty: {
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.24)",
-    borderRadius: 16,
-    backgroundColor: "#06152b",
+    borderColor: "#dce6f0",
+    borderRadius: 12,
+    backgroundColor: "#fff",
     padding: 16
   },
   emptyTitle: {
-    color: "#edf8ff",
+    color: "#07142a",
     fontSize: 18,
     fontWeight: "900"
   },
   emptyText: {
-    color: "#8ea7c4",
+    color: "#53647c",
     marginTop: 4
   }
 });

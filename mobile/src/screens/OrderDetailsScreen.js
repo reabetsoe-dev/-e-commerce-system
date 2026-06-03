@@ -121,7 +121,7 @@ function SummaryLine({ label, value, total }) {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#020817"
+    backgroundColor: "#f5f8fb"
   },
   content: {
     padding: 14,
@@ -132,34 +132,34 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#020817"
+    backgroundColor: "#f5f8fb"
   },
   card: {
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.24)",
-    borderRadius: 16,
-    backgroundColor: "#06152b",
+    borderColor: "#dce8f1",
+    borderRadius: 12,
+    backgroundColor: "#fff",
     padding: 14,
     gap: 7
   },
   sectionTitle: {
-    color: "#edf8ff",
+    color: "#12384b",
     fontSize: 18,
     fontWeight: "900"
   },
   meta: {
-    color: "#c3d2e4",
+    color: "#3a5a69",
     lineHeight: 20
   },
   statusBadge: {
     alignSelf: "flex-start",
-    backgroundColor: "rgba(32,242,163,0.12)",
+    backgroundColor: "#e6f7f2",
     borderRadius: 999,
     paddingHorizontal: 12,
     paddingVertical: 6
   },
   statusText: {
-    color: "#20f2a3",
+    color: "#0e6f6d",
     fontWeight: "900"
   },
   summaryLine: {
@@ -168,40 +168,40 @@ const styles = StyleSheet.create({
     gap: 12
   },
   summaryLabel: {
-    color: "#8ea7c4",
+    color: "#5f7380",
     fontWeight: "800"
   },
   summaryValue: {
-    color: "#edf8ff",
+    color: "#07142a",
     fontWeight: "900"
   },
   totalLine: {
     borderTopWidth: 1,
-    borderTopColor: "rgba(0,166,255,0.24)",
+    borderTopColor: "#d8e5e1",
     paddingTop: 10,
     marginTop: 2
   },
   totalText: {
-    color: "#20f2a3",
+    color: "#0b5f5c",
     fontSize: 18,
     fontWeight: "900"
   },
   timelineRow: {
     borderLeftWidth: 3,
-    borderLeftColor: "rgba(0,217,255,0.35)",
+    borderLeftColor: "#d2e5df",
     paddingLeft: 10,
     gap: 1
   },
   timelineTime: {
-    color: "#8ea7c4",
+    color: "#5f7784",
     fontSize: 12
   },
   timelineStatus: {
-    color: "#edf8ff",
+    color: "#1c475b",
     fontWeight: "900"
   },
   timelineNote: {
-    color: "#8ea7c4",
+    color: "#546d7b",
     fontSize: 12
   },
   error: {

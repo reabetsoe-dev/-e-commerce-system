@@ -139,7 +139,7 @@ export default function HostingPlansScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#020817"
+    backgroundColor: "#f5f8fb"
   },
   content: {
     padding: 14,
@@ -148,21 +148,21 @@ const styles = StyleSheet.create({
   },
   loadingInline: {
     borderRadius: 12,
-    backgroundColor: "#06152b",
+    backgroundColor: "#fff",
     padding: 14,
     flexDirection: "row",
     alignItems: "center",
     gap: 8
   },
   loadingText: {
-    color: "#c3d2e4",
+    color: "#174254",
     fontWeight: "800"
   },
   card: {
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.24)",
-    borderRadius: 16,
-    backgroundColor: "#06152b",
+    borderColor: "#dce8f1",
+    borderRadius: 12,
+    backgroundColor: "#fff",
     padding: 14,
     gap: 8,
     shadowColor: "#0b376b",
@@ -175,9 +175,9 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 170,
     borderRadius: 16,
-    backgroundColor: "#071b33",
+    backgroundColor: "#f7fbff",
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.18)"
+    borderColor: "#e7eef7"
   },
   tag: {
     alignSelf: "flex-start",
@@ -191,12 +191,12 @@ const styles = StyleSheet.create({
     textTransform: "uppercase"
   },
   title: {
-    color: "#edf8ff",
+    color: "#12384b",
     fontSize: 20,
     fontWeight: "900"
   },
   description: {
-    color: "#8ea7c4",
+    color: "#5d7380",
     lineHeight: 20
   },
   priceRow: {
@@ -205,16 +205,16 @@ const styles = StyleSheet.create({
     gap: 6
   },
   price: {
-    color: "#20f2a3",
+    color: "#0b5f5c",
     fontSize: 23,
     fontWeight: "900"
   },
   perMonth: {
-    color: "#8ea7c4",
+    color: "#5f7380",
     marginBottom: 3
   },
   spec: {
-    color: "#c3d2e4"
+    color: "#3a5a69"
   },
   actionRow: {
     flexDirection: "row",
@@ -223,7 +223,7 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     flex: 1,
-    backgroundColor: "#149dff",
+    backgroundColor: "#0644ca",
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: "center"
@@ -235,14 +235,14 @@ const styles = StyleSheet.create({
   lightButton: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "rgba(0,217,255,0.34)",
-    backgroundColor: "rgba(0,217,255,0.05)",
+    borderColor: "#d8e5ff",
+    backgroundColor: "#f5f8ff",
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: "center"
   },
   lightButtonText: {
-    color: "#03d9ff",
+    color: "#173240",
     fontWeight: "900"
   },
   disabled: {

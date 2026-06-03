@@ -110,7 +110,7 @@ export default function InfoScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#020817"
+    backgroundColor: "#f5f8fb"
   },
   content: {
     padding: 12,
@@ -122,19 +122,19 @@ const styles = StyleSheet.create({
   },
   card: {
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.24)",
-    borderRadius: 16,
-    backgroundColor: "#06152b",
+    borderColor: "#d7e4e0",
+    borderRadius: 12,
+    backgroundColor: "#fff",
     padding: 14,
     gap: 6
   },
   cardTitle: {
-    color: "#edf8ff",
+    color: "#12384b",
     fontSize: 18,
     fontWeight: "900"
   },
   cardText: {
-    color: "#8ea7c4",
+    color: "#5d7380",
     lineHeight: 20
   },
   form: {
@@ -143,12 +143,12 @@ const styles = StyleSheet.create({
   input: {
     minHeight: 48,
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.28)",
+    borderColor: "#ccddda",
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    color: "#edf8ff",
-    backgroundColor: "#071b33",
+    color: "#163a4c",
+    backgroundColor: "#fff",
     fontWeight: "800"
   },
   messageInput: {
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   primaryButton: {
     minHeight: 48,
     borderRadius: 12,
-    backgroundColor: "#149dff",
+    backgroundColor: "#0644ca",
     alignItems: "center",
     justifyContent: "center"
   },

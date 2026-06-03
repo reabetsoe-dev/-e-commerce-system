@@ -303,7 +303,7 @@ function SummaryCard({ label, value }) {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#020817"
+    backgroundColor: "#f5f8fb"
   },
   content: {
     padding: 14,
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#020817"
+    backgroundColor: "#f5f8fb"
   },
   summaryGrid: {
     flexDirection: "row",
@@ -325,43 +325,43 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     flexBasis: "47%",
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.24)",
-    borderRadius: 16,
-    backgroundColor: "#06152b",
+    borderColor: "#e3eaf0",
+    borderRadius: 12,
+    backgroundColor: "#fff",
     padding: 12
   },
   summaryLabel: {
-    color: "#8ea7c4",
+    color: "#66768b",
     fontWeight: "800"
   },
   summaryValue: {
-    color: "#edf8ff",
+    color: "#18243a",
     fontSize: 21,
     fontWeight: "900",
     marginTop: 4
   },
   card: {
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.24)",
-    borderRadius: 16,
-    backgroundColor: "#06152b",
+    borderColor: "#e3eaf0",
+    borderRadius: 12,
+    backgroundColor: "#fff",
     padding: 14,
     gap: 9
   },
   sectionTitle: {
-    color: "#edf8ff",
+    color: "#18243a",
     fontSize: 19,
     fontWeight: "900"
   },
   input: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "rgba(0,166,255,0.28)",
+    borderColor: "#dce6f0",
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: "#071b33",
-    color: "#edf8ff",
+    backgroundColor: "#fff",
+    color: "#18243a",
     fontWeight: "800"
   },
   row: {
@@ -373,36 +373,36 @@ const styles = StyleSheet.create({
   },
   chip: {
     borderWidth: 1,
-    borderColor: "rgba(0,217,255,0.26)",
+    borderColor: "#c8deda",
     borderRadius: 999,
     paddingHorizontal: 12,
     paddingVertical: 8
   },
   smallChip: {
     borderWidth: 1,
-    borderColor: "rgba(0,217,255,0.26)",
+    borderColor: "#c8deda",
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 6
   },
   chipActive: {
-    borderColor: "#03d9ff",
-    backgroundColor: "rgba(0,217,255,0.12)"
+    borderColor: "#0644ca",
+    backgroundColor: "#eef4ff"
   },
   chipText: {
-    color: "#c3d2e4",
+    color: "#173240",
     fontWeight: "800"
   },
   smallChipText: {
-    color: "#c3d2e4",
+    color: "#173240",
     fontSize: 12,
     fontWeight: "800"
   },
   chipTextActive: {
-    color: "#03d9ff"
+    color: "#0644ca"
   },
   primaryButton: {
-    backgroundColor: "#149dff",
+    backgroundColor: "#0644ca",
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: "center"
@@ -414,28 +414,28 @@ const styles = StyleSheet.create({
   lightButton: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "rgba(0,217,255,0.3)",
-    backgroundColor: "#071b33",
+    borderColor: "#c8deda",
+    backgroundColor: "#f2f8f6",
     borderRadius: 12,
     paddingVertical: 10,
     alignItems: "center"
   },
   lightButtonText: {
-    color: "#03d9ff",
+    color: "#173240",
     fontWeight: "900"
   },
   listItem: {
     borderTopWidth: 1,
-    borderTopColor: "rgba(0,166,255,0.18)",
+    borderTopColor: "#edf2f1",
     paddingTop: 9,
     gap: 6
   },
   itemTitle: {
-    color: "#edf8ff",
+    color: "#12384b",
     fontWeight: "900"
   },
   meta: {
-    color: "#8ea7c4",
+    color: "#5d7380",
     lineHeight: 20
   },
   error: {
