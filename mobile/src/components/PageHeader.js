@@ -1,7 +1,9 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-export default function PageHeader({ title, subtitle, eyebrow, fallback = "Products", children }) {
+const TAB_ROUTES = new Set(["Home", "Catalog", "Hosting", "Wishlist", "Cart", "Orders", "Profile", "Admin"]);
+
+export default function PageHeader({ title, subtitle, eyebrow, fallback = "Catalog", children }) {
   const navigation = useNavigation();
 
   const goBack = () => {
@@ -9,6 +11,11 @@ export default function PageHeader({ title, subtitle, eyebrow, fallback = "Produ
       navigation.goBack();
       return;
     }
+    if (TAB_ROUTES.has(fallback)) {
+      navigation.navigate("Tabs", { screen: fallback });
+      return;
+    }
+
     navigation.navigate(fallback);
   };
 
@@ -18,7 +25,7 @@ export default function PageHeader({ title, subtitle, eyebrow, fallback = "Produ
         <Pressable style={styles.backButton} onPress={goBack} accessibilityLabel="Go back">
           <Text style={styles.backText}>{"<"}</Text>
         </Pressable>
-        <Text style={styles.crumb}>{fallback === "Products" ? "Home / " : ""}{title}</Text>
+        <Text style={styles.crumb}>{fallback === "Catalog" ? "Home / " : ""}{title}</Text>
       </View>
 
       <View style={styles.hero}>

@@ -52,12 +52,12 @@ export default function OrdersScreen() {
             <PageHeader
               title="Order Tracking"
               subtitle="Track each order from payment to delivery."
-              fallback="Products"
+              fallback="Catalog"
             />
             {error ? <Text style={styles.error}>{error}</Text> : null}
             {loading ? (
               <View style={styles.loadingInline}>
-                <ActivityIndicator color="#0644ca" />
+                <ActivityIndicator color="#03d9ff" />
                 <Text style={styles.loadingText}>Loading orders...</Text>
               </View>
             ) : null}
@@ -97,23 +97,23 @@ export default function OrdersScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#f4f8fb"
+    backgroundColor: "#020817"
   },
   content: {
-    padding: 12,
+    padding: 14,
     paddingBottom: 28,
     gap: 10
   },
   loadingInline: {
     borderRadius: 12,
-    backgroundColor: "#fff",
+    backgroundColor: "#06152b",
     padding: 14,
     flexDirection: "row",
     alignItems: "center",
     gap: 8
   },
   loadingText: {
-    color: "#174254",
+    color: "#c3d2e4",
     fontWeight: "800"
   },
   error: {
@@ -127,25 +127,25 @@ const styles = StyleSheet.create({
   },
   empty: {
     borderWidth: 1,
-    borderColor: "#dce8f1",
-    borderRadius: 20,
-    backgroundColor: "#fff",
+    borderColor: "rgba(0,166,255,0.24)",
+    borderRadius: 16,
+    backgroundColor: "#06152b",
     padding: 16
   },
   emptyTitle: {
     fontWeight: "900",
-    color: "#16394a",
+    color: "#edf8ff",
     fontSize: 18
   },
   emptyText: {
-    color: "#5e7280",
+    color: "#8ea7c4",
     marginTop: 4
   },
   card: {
     borderWidth: 1,
-    borderColor: "#dce8f1",
-    borderRadius: 20,
-    backgroundColor: "#fff",
+    borderColor: "rgba(0,166,255,0.24)",
+    borderRadius: 16,
+    backgroundColor: "#06152b",
     padding: 13,
     gap: 5
   },
@@ -158,25 +158,25 @@ const styles = StyleSheet.create({
   },
   orderId: {
     flex: 1,
-    color: "#15384b",
+    color: "#edf8ff",
     fontWeight: "900"
   },
   statusBadge: {
-    backgroundColor: "#e6f7f2",
+    backgroundColor: "rgba(32,242,163,0.12)",
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 4
   },
   statusText: {
-    color: "#0e6f6d",
+    color: "#20f2a3",
     fontWeight: "900",
     fontSize: 12
   },
   meta: {
-    color: "#5d7381"
+    color: "#8ea7c4"
   },
   linkText: {
-    color: "#0644ca",
+    color: "#03d9ff",
     fontWeight: "900",
     marginTop: 5
   }

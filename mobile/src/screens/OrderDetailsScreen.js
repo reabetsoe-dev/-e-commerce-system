@@ -41,7 +41,7 @@ export default function OrderDetailsScreen() {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0644ca" />
+        <ActivityIndicator size="large" color="#03d9ff" />
       </View>
     );
   }
@@ -121,10 +121,10 @@ function SummaryLine({ label, value, total }) {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#f4f8fb"
+    backgroundColor: "#020817"
   },
   content: {
-    padding: 12,
+    padding: 14,
     paddingBottom: 28,
     gap: 10
   },
@@ -132,34 +132,34 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f4f8fb"
+    backgroundColor: "#020817"
   },
   card: {
     borderWidth: 1,
-    borderColor: "#dce8f1",
-    borderRadius: 20,
-    backgroundColor: "#fff",
+    borderColor: "rgba(0,166,255,0.24)",
+    borderRadius: 16,
+    backgroundColor: "#06152b",
     padding: 14,
     gap: 7
   },
   sectionTitle: {
-    color: "#12384b",
+    color: "#edf8ff",
     fontSize: 18,
     fontWeight: "900"
   },
   meta: {
-    color: "#3a5a69",
+    color: "#c3d2e4",
     lineHeight: 20
   },
   statusBadge: {
     alignSelf: "flex-start",
-    backgroundColor: "#e6f7f2",
+    backgroundColor: "rgba(32,242,163,0.12)",
     borderRadius: 999,
     paddingHorizontal: 12,
     paddingVertical: 6
   },
   statusText: {
-    color: "#0e6f6d",
+    color: "#20f2a3",
     fontWeight: "900"
   },
   summaryLine: {
@@ -168,40 +168,40 @@ const styles = StyleSheet.create({
     gap: 12
   },
   summaryLabel: {
-    color: "#5f7380",
+    color: "#8ea7c4",
     fontWeight: "800"
   },
   summaryValue: {
-    color: "#07142a",
+    color: "#edf8ff",
     fontWeight: "900"
   },
   totalLine: {
     borderTopWidth: 1,
-    borderTopColor: "#d8e5e1",
+    borderTopColor: "rgba(0,166,255,0.24)",
     paddingTop: 10,
     marginTop: 2
   },
   totalText: {
-    color: "#0b5f5c",
+    color: "#20f2a3",
     fontSize: 18,
     fontWeight: "900"
   },
   timelineRow: {
     borderLeftWidth: 3,
-    borderLeftColor: "#d2e5df",
+    borderLeftColor: "rgba(0,217,255,0.35)",
     paddingLeft: 10,
     gap: 1
   },
   timelineTime: {
-    color: "#5f7784",
+    color: "#8ea7c4",
     fontSize: 12
   },
   timelineStatus: {
-    color: "#1c475b",
+    color: "#edf8ff",
     fontWeight: "900"
   },
   timelineNote: {
-    color: "#546d7b",
+    color: "#8ea7c4",
     fontSize: 12
   },
   error: {

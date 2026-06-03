@@ -87,36 +87,36 @@ export default function WishlistScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#f4f8fb"
+    backgroundColor: "#020817"
   },
   content: {
-    padding: 12,
+    padding: 14,
     paddingBottom: 28,
     gap: 10
   },
   status: {
-    color: "#1e7d52",
-    backgroundColor: "#eaf9f0",
+    color: "#20f2a3",
+    backgroundColor: "rgba(32,242,163,0.1)",
     borderWidth: 1,
-    borderColor: "#c4e9d2",
+    borderColor: "rgba(32,242,163,0.28)",
     borderRadius: 10,
     padding: 10,
     fontWeight: "700"
   },
   empty: {
     borderWidth: 1,
-    borderColor: "#dce8f1",
-    borderRadius: 20,
-    backgroundColor: "#fff",
+    borderColor: "rgba(0,166,255,0.24)",
+    borderRadius: 16,
+    backgroundColor: "#06152b",
     padding: 16
   },
   emptyTitle: {
-    color: "#15384b",
+    color: "#edf8ff",
     fontSize: 18,
     fontWeight: "900"
   },
   emptyText: {
-    color: "#5f7480",
+    color: "#8ea7c4",
     marginTop: 4
   }
 });

@@ -52,8 +52,6 @@ export default function NavBar() {
   const navClassName = ({ isActive }) => (isActive ? "nav-item nav-item-active" : "nav-item");
   const actionClassName = ({ isActive }) =>
     isActive ? "market-action market-action-active" : "market-action";
-  const mobileNavClassName = ({ isActive }) =>
-    isActive ? "mobile-bottom-nav-item is-active" : "mobile-bottom-nav-item";
 
   return (
     <header className="topbar market-topbar">
@@ -170,54 +168,6 @@ export default function NavBar() {
           )}
         </nav>
       </div>
-
-      <nav className="mobile-bottom-nav" aria-label="Mobile primary navigation" data-cy="mobile-bottom-nav">
-        {isAdmin ? (
-          <>
-            <NavLink to="/admin" className={mobileNavClassName} onClick={() => setOpen(false)}>
-              Admin
-            </NavLink>
-            <NavLink to="/catalog" className={mobileNavClassName} onClick={() => setOpen(false)}>
-              Catalog
-            </NavLink>
-            <NavLink to="/hosting" className={mobileNavClassName} onClick={() => setOpen(false)}>
-              Hosting
-            </NavLink>
-          </>
-        ) : (
-          <>
-            <NavLink end to="/" className={mobileNavClassName} onClick={() => setOpen(false)}>
-              Home
-            </NavLink>
-            <NavLink to="/catalog" className={mobileNavClassName} onClick={() => setOpen(false)}>
-              Catalog
-            </NavLink>
-            {user ? (
-              <>
-                <NavLink to="/cart" className={mobileNavClassName} onClick={() => setOpen(false)}>
-                  Cart
-                  {cartCount > 0 && <em>{cartCount}</em>}
-                </NavLink>
-                <NavLink to="/orders" className={mobileNavClassName} onClick={() => setOpen(false)}>
-                  Orders
-                </NavLink>
-                <NavLink to="/profile" className={mobileNavClassName} onClick={() => setOpen(false)}>
-                  Account
-                </NavLink>
-              </>
-            ) : (
-              <>
-                <NavLink to="/hosting" className={mobileNavClassName} onClick={() => setOpen(false)}>
-                  Hosting
-                </NavLink>
-                <NavLink to="/auth" className={mobileNavClassName} onClick={() => setOpen(false)}>
-                  Login
-                </NavLink>
-              </>
-            )}
-          </>
-        )}
-      </nav>
     </header>
   );
 }

@@ -78,7 +78,8 @@ describe("Android responsive layout", () => {
 
       it("renders catalog and product cards as a one-column mobile layout", () => {
         cy.visit("/catalog");
-        cy.getBySel("mobile-bottom-nav").should("be.visible");
+        cy.get(".market-topbar").should("be.visible");
+        cy.getBySel("mobile-bottom-nav").should("not.exist");
         cy.getBySel("catalog-search-input").should("be.visible");
         assertCatalogIsOneColumn();
         assertMobileControlsFit();
@@ -123,7 +124,7 @@ describe("Android responsive layout", () => {
         assertNoHorizontalOverflow();
 
         visitAsAdmin("/admin");
-        cy.contains("Admin Control Center", { timeout: 20000 }).should("be.visible");
+        cy.contains("Recent Orders", { timeout: 20000 }).should("be.visible");
         cy.contains("Products").click();
         cy.contains("Add Product").should("be.visible");
         assertMobileControlsFit();

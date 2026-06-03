@@ -22,6 +22,8 @@ export default function ProfileScreen() {
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
 
   const onSubmit = async () => {
     setBusy(true);
@@ -60,21 +62,33 @@ export default function ProfileScreen() {
         <Text style={styles.label}>Role</Text>
         <Text style={styles.value}>{user?.role}</Text>
         <Text style={styles.label}>Current Password</Text>
-        <TextInput
-          style={styles.input}
-          value={form.currentPassword}
-          onChangeText={(value) => setForm((current) => ({ ...current, currentPassword: value }))}
-          placeholder="Required only if changing password"
-          secureTextEntry
-        />
+        <View style={styles.passwordRow}>
+          <TextInput
+            style={[styles.input, styles.passwordInput]}
+            value={form.currentPassword}
+            onChangeText={(value) => setForm((current) => ({ ...current, currentPassword: value }))}
+            placeholder="Required only if changing password"
+            placeholderTextColor="#8ea7c4"
+            secureTextEntry={!showCurrent}
+          />
+          <Pressable style={styles.passwordToggle} onPress={() => setShowCurrent((state) => !state)}>
+            <Text style={styles.passwordToggleText}>{showCurrent ? "Hide" : "Show"}</Text>
+          </Pressable>
+        </View>
         <Text style={styles.label}>New Password</Text>
-        <TextInput
-          style={styles.input}
-          value={form.newPassword}
-          onChangeText={(value) => setForm((current) => ({ ...current, newPassword: value }))}
-          placeholder="At least 8 chars with mixed case and number"
-          secureTextEntry
-        />
+        <View style={styles.passwordRow}>
+          <TextInput
+            style={[styles.input, styles.passwordInput]}
+            value={form.newPassword}
+            onChangeText={(value) => setForm((current) => ({ ...current, newPassword: value }))}
+            placeholder="At least 8 chars with mixed case and number"
+            placeholderTextColor="#8ea7c4"
+            secureTextEntry={!showNew}
+          />
+          <Pressable style={styles.passwordToggle} onPress={() => setShowNew((state) => !state)}>
+            <Text style={styles.passwordToggleText}>{showNew ? "Hide" : "Show"}</Text>
+          </Pressable>
+        </View>
         <Pressable style={[styles.primaryButton, busy && styles.disabled]} onPress={onSubmit} disabled={busy}>
           <Text style={styles.primaryButtonText}>{busy ? "Saving..." : "Save Profile"}</Text>
         </Pressable>
@@ -108,7 +122,7 @@ function NavButton({ label, onPress }) {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#f4f8fb"
+    backgroundColor: "#020817"
   },
   content: {
     padding: 12,
@@ -117,42 +131,65 @@ const styles = StyleSheet.create({
   },
   card: {
     borderWidth: 1,
-    borderColor: "#dce8f1",
-    borderRadius: 20,
-    backgroundColor: "#fff",
+    borderColor: "rgba(0,166,255,0.24)",
+    borderRadius: 16,
+    backgroundColor: "#06152b",
     padding: 14,
     gap: 8
   },
   sectionTitle: {
-    color: "#12384b",
+    color: "#edf8ff",
     fontSize: 18,
     fontWeight: "900"
   },
   label: {
-    color: "#5f7280",
+    color: "#8ea7c4",
     fontSize: 12,
     fontWeight: "900",
     textTransform: "uppercase",
     marginTop: 4
   },
   value: {
-    color: "#163a4c",
+    color: "#edf8ff",
     fontWeight: "800"
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccddda",
+    borderColor: "rgba(0,166,255,0.28)",
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: "#fff"
+    backgroundColor: "#071b33",
+    color: "#edf8ff",
+    fontWeight: "800"
   },
   disabledInput: {
-    color: "#607582",
-    backgroundColor: "#f5f8f7"
+    color: "#8ea7c4",
+    backgroundColor: "#071b33"
+  },
+  passwordRow: {
+    flexDirection: "row",
+    gap: 8,
+    alignItems: "stretch"
+  },
+  passwordInput: {
+    flex: 1
+  },
+  passwordToggle: {
+    width: 70,
+    borderWidth: 1,
+    borderColor: "rgba(0,217,255,0.3)",
+    borderRadius: 12,
+    backgroundColor: "rgba(0,217,255,0.06)",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  passwordToggleText: {
+    color: "#03d9ff",
+    fontWeight: "900"
   },
   primaryButton: {
-    backgroundColor: "#0644ca",
+    backgroundColor: "#149dff",
     borderRadius: 12,
     alignItems: "center",
     paddingVertical: 12,
@@ -164,24 +201,26 @@ const styles = StyleSheet.create({
   },
   navButton: {
     borderWidth: 1,
-    borderColor: "#c8deda",
-    backgroundColor: "#f2f8f6",
+    borderColor: "rgba(0,217,255,0.3)",
+    backgroundColor: "#071b33",
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 12
   },
   navButtonText: {
-    color: "#173240",
+    color: "#edf8ff",
     fontWeight: "900"
   },
   logoutBtn: {
-    backgroundColor: "#c73f45",
+    backgroundColor: "rgba(255,107,133,0.16)",
+    borderWidth: 1,
+    borderColor: "rgba(255,107,133,0.36)",
     borderRadius: 12,
     alignItems: "center",
     paddingVertical: 13
   },
   logoutText: {
-    color: "#fff",
+    color: "#ff8aa0",
     fontWeight: "900"
   },
   disabled: {

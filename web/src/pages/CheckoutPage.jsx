@@ -84,6 +84,14 @@ function isValidLesothoNumber(value) {
   return /^[56]\d{7}$/.test(getLesothoDigits(value));
 }
 
+function isValidEcocashNumber(value) {
+  return /^6\d{7}$/.test(getLesothoDigits(value));
+}
+
+function getMobileMoneyNumberExample(method) {
+  return method === "Ecocash" ? "+266 6xxx xxxx" : "+266 5xxx xxxx";
+}
+
 function isValidCardNumber(value) {
   const digits = String(value || "").replace(/\D/g, "");
   return /^\d{13,19}$/.test(digits);
@@ -257,9 +265,13 @@ export default function CheckoutPage() {
         nextFieldErrors[form.lesothoNumber ? "lesothoNumber" : "phoneNumber"] = mobileMoneyInputError;
       }
 
-      if (!isValidLesothoNumber(mobileMoneyNumber)) {
+      const isValidMobileMoneyNumber =
+        form.paymentMethod === "Ecocash"
+          ? isValidEcocashNumber(mobileMoneyNumber)
+          : isValidLesothoNumber(mobileMoneyNumber);
+      if (!isValidMobileMoneyNumber) {
         setFieldErrors(nextFieldErrors);
-        return "Enter a valid Lesotho mobile number, for example +266 5xxx xxxx.";
+        return `Enter a valid Lesotho mobile number, for example ${getMobileMoneyNumberExample(form.paymentMethod)}.`;
       }
     }
 
@@ -597,7 +609,7 @@ export default function CheckoutPage() {
                                 inputMode="tel"
                                 value={form.lesothoNumber}
                                 onChange={(event) => updateForm("lesothoNumber", event.target.value)}
-                                placeholder="+266 5xxx xxxx"
+                                placeholder={getMobileMoneyNumberExample(form.paymentMethod)}
                                 autoComplete="tel"
                                 data-cy="checkout-lesotho-number"
                               />
@@ -609,10 +621,6 @@ export default function CheckoutPage() {
                               <span>Amount</span>
                               <strong>{formatMoney(previewTotals.grandTotal)}</strong>
                             </div>
-                            <p className="checkout-simulated-note">
-                              <CheckoutIcon name="shield" />
-                              This is a simulated payment for testing purposes.
-                            </p>
                           </div>
                         )}
 
@@ -631,7 +639,7 @@ export default function CheckoutPage() {
                               />
                             </label>
                             <label>
-                              <span>Payment Reference</span>
+                              <span>Account Number</span>
                               <input
                                 type="text"
                                 inputMode="numeric"
@@ -648,7 +656,7 @@ export default function CheckoutPage() {
                               )}
                             </label>
                             <label>
-                              <span>Reference Date</span>
+                              <span>Expiry Date</span>
                               <input
                                 type="text"
                                 inputMode="numeric"
@@ -664,7 +672,7 @@ export default function CheckoutPage() {
                               )}
                             </label>
                             <label>
-                              <span>Security Code</span>
+                              <span>CVC</span>
                               <input
                                 type="text"
                                 inputMode="numeric"
@@ -679,10 +687,6 @@ export default function CheckoutPage() {
                               />
                               {fieldErrors.cvc && <small className="checkout-field-error">{fieldErrors.cvc}</small>}
                             </label>
-                            <p className="checkout-simulated-note">
-                              <CheckoutIcon name="shield" />
-                              This is a simulated payment for testing purposes. No real money will be charged.
-                            </p>
                           </div>
                         )}
                       </div>

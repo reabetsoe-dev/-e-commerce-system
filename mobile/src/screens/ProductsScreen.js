@@ -16,6 +16,7 @@ import PageHeader from "../components/PageHeader";
 import ProductCard from "../components/ProductCard";
 import api, { getApiError, resolveAssetUrl } from "../api/client";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { useShop } from "../context/ShopContext";
 import { SHOP_CATEGORIES, getSubcategoriesForCategory } from "../data/shopCategories";
 import {
@@ -132,6 +133,7 @@ function applyClientFilters(items, currentFilters) {
 
 export default function ProductsScreen() {
   const navigation = useNavigation();
+  const { user } = useAuth();
   const { addToCart } = useCart();
   const { wishlistIds, toggleWishlist, refreshWishlist } = useShop();
   const [products, setProducts] = useState([]);
@@ -240,6 +242,12 @@ export default function ProductsScreen() {
   };
 
   const onAddToCart = async (productId) => {
+    if (!user) {
+      setStatus("Login or register to add products to your cart.");
+      navigation.navigate("Auth", { redirectScreen: "Cart" });
+      return;
+    }
+
     setStatus("");
     setBusyId(productId);
     try {
@@ -253,6 +261,12 @@ export default function ProductsScreen() {
   };
 
   const onWishlist = async (productId) => {
+    if (!user) {
+      setStatus("Login or register to save products to your wishlist.");
+      navigation.navigate("Auth", { redirectScreen: "Wishlist" });
+      return;
+    }
+
     try {
       await toggleWishlist(productId);
       setStatus("Wishlist updated.");

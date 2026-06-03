@@ -39,12 +39,17 @@ export default function App() {
   const location = useLocation();
   const isHome = location.pathname === "/";
   const isAuth = location.pathname === "/auth";
+  const isAdmin = location.pathname.startsWith("/admin");
   const showNavBar = !isHome;
 
   return (
     <div className={`app-shell ${isHome ? "home-app-shell" : ""} ${isAuth ? "auth-app-shell" : ""}`}>
       {showNavBar && <NavBar />}
-      <main className={`container page ${isHome ? "home-page" : ""} ${isAuth ? "auth-page" : ""}`}>
+      <main
+        className={`container page ${isHome ? "home-page" : ""} ${isAuth ? "auth-page" : ""} ${
+          isAdmin ? "admin-page" : ""
+        }`}
+      >
         <Routes>
           <Route path="/" element={<HomeRoute />} />
           <Route path="/catalog" element={<ProductsPage />} />

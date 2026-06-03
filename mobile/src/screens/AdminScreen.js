@@ -23,7 +23,7 @@ import {
   getNumericInputError
 } from "../utils/numericValidation";
 
-const ORDER_STATUSES = ["Pending", "Paid", "Processing", "Shipped", "Delivered", "Cancelled"];
+const ORDER_STATUSES = ["Pending", "Paid", "Processing", "Shipped", "Delivered", "Cancelled", "Failed", "Refunded"];
 
 const INITIAL_PRODUCT = {
   name: "",
@@ -173,7 +173,7 @@ export default function AdminScreen() {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0644ca" />
+        <ActivityIndicator size="large" color="#03d9ff" />
       </View>
     );
   }
@@ -197,8 +197,8 @@ export default function AdminScreen() {
 
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>Add Product</Text>
-        <TextInput style={styles.input} placeholder="Name" value={newProduct.name} onChangeText={(value) => setProductField("name", value)} />
-        <TextInput style={styles.input} placeholder="Description" value={newProduct.description} onChangeText={(value) => setProductField("description", value)} />
+        <TextInput style={styles.input} placeholder="Name" placeholderTextColor="#8ea7c4" value={newProduct.name} onChangeText={(value) => setProductField("name", value)} />
+        <TextInput style={styles.input} placeholder="Description" placeholderTextColor="#8ea7c4" value={newProduct.description} onChangeText={(value) => setProductField("description", value)} />
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
           {PRODUCT_CATEGORIES.map((category) => (
             <Pressable
@@ -226,13 +226,13 @@ export default function AdminScreen() {
           ))}
         </ScrollView>
         <View style={styles.row}>
-          <TextInput style={styles.input} placeholder="Price" keyboardType="numeric" value={newProduct.price} onChangeText={(value) => setProductField("price", value)} />
+          <TextInput style={styles.input} placeholder="Price" placeholderTextColor="#8ea7c4" keyboardType="numeric" value={newProduct.price} onChangeText={(value) => setProductField("price", value)} />
           {newProduct.type !== "service" ? (
-            <TextInput style={styles.input} placeholder="Stock" keyboardType="numeric" value={newProduct.stock} onChangeText={(value) => setProductField("stock", value)} />
+            <TextInput style={styles.input} placeholder="Stock" placeholderTextColor="#8ea7c4" keyboardType="numeric" value={newProduct.stock} onChangeText={(value) => setProductField("stock", value)} />
           ) : null}
         </View>
-        <TextInput style={styles.input} placeholder="Image URL" value={newProduct.imageUrl} onChangeText={(value) => setProductField("imageUrl", value)} />
-        <TextInput style={styles.input} placeholder="Discount %" keyboardType="numeric" value={newProduct.discountPercent} onChangeText={(value) => setProductField("discountPercent", value)} />
+        <TextInput style={styles.input} placeholder="Image URL" placeholderTextColor="#8ea7c4" value={newProduct.imageUrl} onChangeText={(value) => setProductField("imageUrl", value)} />
+        <TextInput style={styles.input} placeholder="Discount %" placeholderTextColor="#8ea7c4" keyboardType="numeric" value={newProduct.discountPercent} onChangeText={(value) => setProductField("discountPercent", value)} />
         <Pressable style={styles.primaryButton} onPress={createProduct}>
           <Text style={styles.primaryButtonText}>Create Product</Text>
         </Pressable>
@@ -303,10 +303,10 @@ function SummaryCard({ label, value }) {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#f4f8fb"
+    backgroundColor: "#020817"
   },
   content: {
-    padding: 12,
+    padding: 14,
     paddingBottom: 28,
     gap: 10
   },
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f4f8fb"
+    backgroundColor: "#020817"
   },
   summaryGrid: {
     flexDirection: "row",
@@ -325,42 +325,44 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     flexBasis: "47%",
     borderWidth: 1,
-    borderColor: "#dce8f1",
+    borderColor: "rgba(0,166,255,0.24)",
     borderRadius: 16,
-    backgroundColor: "#fff",
+    backgroundColor: "#06152b",
     padding: 12
   },
   summaryLabel: {
-    color: "#5f7380",
+    color: "#8ea7c4",
     fontWeight: "800"
   },
   summaryValue: {
-    color: "#12384b",
+    color: "#edf8ff",
     fontSize: 21,
     fontWeight: "900",
     marginTop: 4
   },
   card: {
     borderWidth: 1,
-    borderColor: "#dce8f1",
-    borderRadius: 20,
-    backgroundColor: "#fff",
+    borderColor: "rgba(0,166,255,0.24)",
+    borderRadius: 16,
+    backgroundColor: "#06152b",
     padding: 14,
     gap: 9
   },
   sectionTitle: {
-    color: "#12384b",
+    color: "#edf8ff",
     fontSize: 19,
     fontWeight: "900"
   },
   input: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#ccddda",
+    borderColor: "rgba(0,166,255,0.28)",
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    backgroundColor: "#fff"
+    backgroundColor: "#071b33",
+    color: "#edf8ff",
+    fontWeight: "800"
   },
   row: {
     flexDirection: "row",
@@ -371,36 +373,36 @@ const styles = StyleSheet.create({
   },
   chip: {
     borderWidth: 1,
-    borderColor: "#c8deda",
+    borderColor: "rgba(0,217,255,0.26)",
     borderRadius: 999,
     paddingHorizontal: 12,
     paddingVertical: 8
   },
   smallChip: {
     borderWidth: 1,
-    borderColor: "#c8deda",
+    borderColor: "rgba(0,217,255,0.26)",
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 6
   },
   chipActive: {
-    borderColor: "#0644ca",
-    backgroundColor: "#eef4ff"
+    borderColor: "#03d9ff",
+    backgroundColor: "rgba(0,217,255,0.12)"
   },
   chipText: {
-    color: "#173240",
+    color: "#c3d2e4",
     fontWeight: "800"
   },
   smallChipText: {
-    color: "#173240",
+    color: "#c3d2e4",
     fontSize: 12,
     fontWeight: "800"
   },
   chipTextActive: {
-    color: "#0644ca"
+    color: "#03d9ff"
   },
   primaryButton: {
-    backgroundColor: "#0644ca",
+    backgroundColor: "#149dff",
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: "center"
@@ -412,28 +414,28 @@ const styles = StyleSheet.create({
   lightButton: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#c8deda",
-    backgroundColor: "#f2f8f6",
+    borderColor: "rgba(0,217,255,0.3)",
+    backgroundColor: "#071b33",
     borderRadius: 12,
     paddingVertical: 10,
     alignItems: "center"
   },
   lightButtonText: {
-    color: "#173240",
+    color: "#03d9ff",
     fontWeight: "900"
   },
   listItem: {
     borderTopWidth: 1,
-    borderTopColor: "#edf2f1",
+    borderTopColor: "rgba(0,166,255,0.18)",
     paddingTop: 9,
     gap: 6
   },
   itemTitle: {
-    color: "#12384b",
+    color: "#edf8ff",
     fontWeight: "900"
   },
   meta: {
-    color: "#5d7380",
+    color: "#8ea7c4",
     lineHeight: 20
   },
   error: {

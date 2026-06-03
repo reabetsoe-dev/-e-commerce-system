@@ -69,6 +69,12 @@ export default function ProductDetailsScreen() {
     if (!id) {
       return;
     }
+    if (!user) {
+      setStatus("Login or register to add products to your cart.");
+      navigation.navigate("Auth", { redirectScreen: "Cart" });
+      return;
+    }
+
     setStatus("");
     setBusyId(id);
     try {
@@ -82,13 +88,25 @@ export default function ProductDetailsScreen() {
   };
 
   const onBuyNow = async () => {
+    if (!user) {
+      setStatus("Login or register to buy this product.");
+      navigation.navigate("Auth", { redirectScreen: "Cart" });
+      return;
+    }
+
     await onAddToCart(product?.id);
     if (!isOutOfStock) {
-      navigation.navigate("Cart");
+      navigation.navigate("Tabs", { screen: "Cart" });
     }
   };
 
   const onWishlist = async (id = product?.id) => {
+    if (!user) {
+      setStatus("Login or register to save products to your wishlist.");
+      navigation.navigate("Auth", { redirectScreen: "Wishlist" });
+      return;
+    }
+
     try {
       await toggleWishlist(id);
       setStatus("Wishlist updated.");
@@ -100,7 +118,7 @@ export default function ProductDetailsScreen() {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#0644ca" />
+        <ActivityIndicator size="large" color="#03d9ff" />
       </View>
     );
   }
@@ -119,7 +137,7 @@ export default function ProductDetailsScreen() {
       <PageHeader
         title={product.name}
         subtitle={`${product.category}${product.subcategory ? ` / ${product.subcategory}` : ""}`}
-        fallback="Products"
+        fallback="Catalog"
       />
 
       {status ? <Text style={styles.status}>{status}</Text> : null}
@@ -207,10 +225,10 @@ export default function ProductDetailsScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#f4f8fb"
+    backgroundColor: "#020817"
   },
   content: {
-    padding: 12,
+    padding: 14,
     paddingBottom: 28,
     gap: 10
   },
@@ -218,13 +236,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f4f8fb"
+    backgroundColor: "#020817"
   },
   card: {
     borderWidth: 1,
-    borderColor: "#dce8f1",
-    borderRadius: 20,
-    backgroundColor: "#fff",
+    borderColor: "rgba(0,166,255,0.24)",
+    borderRadius: 16,
+    backgroundColor: "#06152b",
     padding: 12,
     gap: 10
   },
@@ -232,9 +250,9 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 260,
     borderRadius: 16,
-    backgroundColor: "#f7fbff",
+    backgroundColor: "#071b33",
     borderWidth: 1,
-    borderColor: "#e7eef7"
+    borderColor: "rgba(0,166,255,0.18)"
   },
   thumbRow: {
     gap: 8
@@ -244,18 +262,18 @@ const styles = StyleSheet.create({
     height: 58,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#d7e4e0",
+    borderColor: "rgba(0,166,255,0.24)",
     overflow: "hidden"
   },
   thumbFrameActive: {
-    borderColor: "#0644ca"
+    borderColor: "#03d9ff"
   },
   thumbImage: {
     width: "100%",
     height: "100%"
   },
   description: {
-    color: "#5d7380",
+    color: "#8ea7c4",
     lineHeight: 20
   },
   priceRow: {
@@ -264,7 +282,7 @@ const styles = StyleSheet.create({
     gap: 8
   },
   price: {
-    color: "#07142a",
+    color: "#20f2a3",
     fontSize: 23,
     fontWeight: "900"
   },
@@ -277,7 +295,7 @@ const styles = StyleSheet.create({
     fontWeight: "900"
   },
   meta: {
-    color: "#5b7080",
+    color: "#c3d2e4",
     fontWeight: "700"
   },
   actionRow: {
@@ -286,7 +304,7 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     flex: 1,
-    backgroundColor: "#0644ca",
+    backgroundColor: "#149dff",
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: "center"
@@ -297,35 +315,35 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     flex: 1,
-    backgroundColor: "#f5f8ff",
+    backgroundColor: "rgba(0,217,255,0.05)",
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#d8e5ff"
+    borderColor: "rgba(0,217,255,0.34)"
   },
   secondaryButtonText: {
-    color: "#173240",
+    color: "#03d9ff",
     fontWeight: "900"
   },
   wishlistButton: {
     borderWidth: 1,
-    borderColor: "#b8cef5",
+    borderColor: "rgba(0,217,255,0.34)",
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: "center"
   },
   wishlistButtonText: {
-    color: "#0644ca",
+    color: "#03d9ff",
     fontWeight: "900"
   },
   sectionTitle: {
-    color: "#12384b",
+    color: "#edf8ff",
     fontSize: 18,
     fontWeight: "900"
   },
   specLine: {
-    color: "#3a5a69"
+    color: "#c3d2e4"
   },
   related: {
     gap: 10

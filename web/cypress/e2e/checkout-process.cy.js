@@ -48,4 +48,21 @@ describe("Checkout process", () => {
     cy.getBySel("checkout-success-page").should("be.visible");
     cy.getBySel("view-order-details-button").should("be.visible");
   });
+
+  it("requires EcoCash payments to use a +266 6xxx xxxx Lesotho number", () => {
+    cy.visitAsCustomer("/cart");
+    cy.getBySel("proceed-to-checkout-button").click();
+    cy.location("pathname").should("eq", "/checkout");
+
+    cy.getBySel("checkout-payment-method").contains("Ecocash").click();
+    cy.getBySel("checkout-lesotho-number")
+      .should("have.attr", "placeholder", "+266 6xxx xxxx")
+      .type("+266 5800 0000");
+    cy.getBySel("checkout-continue-button").click();
+    cy.contains("Enter a valid Lesotho mobile number, for example +266 6xxx xxxx.").should("be.visible");
+
+    cy.getBySel("checkout-lesotho-number").clear().type("+266 6800 0000");
+    cy.getBySel("checkout-continue-button").click();
+    cy.getBySel("checkout-place-order-button").should("be.visible");
+  });
 });

@@ -1,5 +1,13 @@
 import { useRoute } from "@react-navigation/native";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View
+} from "react-native";
 import PageHeader from "../components/PageHeader";
 
 const FAQS = [
@@ -9,7 +17,7 @@ const FAQS = [
   },
   {
     q: "How does payment work in this project?",
-    a: "Payment is processed through the project checkout flow for demonstration."
+    a: "Payment is simulated for demonstration but the flow mirrors real-world checkout UX."
   },
   {
     q: "Can I track my order status?",
@@ -50,12 +58,13 @@ const CONTENT = {
 
 export default function InfoScreen() {
   const route = useRoute();
+  const [submitted, setSubmitted] = useState(false);
   const type = route.params?.type || route.name?.toLowerCase() || "about";
   const content = CONTENT[type] || CONTENT.about;
 
   return (
     <ScrollView style={styles.page} contentContainerStyle={styles.content}>
-      <PageHeader title={content.title} subtitle={content.subtitle} fallback="Profile" />
+      <PageHeader title={content.title} subtitle={content.subtitle} fallback="Home" />
       <View style={styles.grid}>
         {content.cards.map(([title, body]) => (
           <View style={styles.card} key={title}>
@@ -63,6 +72,36 @@ export default function InfoScreen() {
             <Text style={styles.cardText}>{body}</Text>
           </View>
         ))}
+        {type === "contact" ? (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Send Message</Text>
+            {submitted ? (
+              <Text style={styles.status}>Your message has been submitted successfully.</Text>
+            ) : (
+              <View style={styles.form}>
+                <TextInput style={styles.input} placeholder="Full Name" placeholderTextColor="#8ea7c4" />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Email"
+                  placeholderTextColor="#8ea7c4"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+                <TextInput style={styles.input} placeholder="Subject" placeholderTextColor="#8ea7c4" />
+                <TextInput
+                  style={[styles.input, styles.messageInput]}
+                  placeholder="Message"
+                  placeholderTextColor="#8ea7c4"
+                  multiline
+                  textAlignVertical="top"
+                />
+                <Pressable style={styles.primaryButton} onPress={() => setSubmitted(true)}>
+                  <Text style={styles.primaryButtonText}>Submit</Text>
+                </Pressable>
+              </View>
+            )}
+          </View>
+        ) : null}
       </View>
     </ScrollView>
   );
@@ -71,7 +110,7 @@ export default function InfoScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#f4f8fb"
+    backgroundColor: "#020817"
   },
   content: {
     padding: 12,
@@ -83,19 +122,56 @@ const styles = StyleSheet.create({
   },
   card: {
     borderWidth: 1,
-    borderColor: "#d7e4e0",
+    borderColor: "rgba(0,166,255,0.24)",
     borderRadius: 16,
-    backgroundColor: "#fff",
+    backgroundColor: "#06152b",
     padding: 14,
     gap: 6
   },
   cardTitle: {
-    color: "#12384b",
+    color: "#edf8ff",
     fontSize: 18,
     fontWeight: "900"
   },
   cardText: {
-    color: "#5d7380",
+    color: "#8ea7c4",
     lineHeight: 20
+  },
+  form: {
+    gap: 9
+  },
+  input: {
+    minHeight: 48,
+    borderWidth: 1,
+    borderColor: "rgba(0,166,255,0.28)",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    color: "#edf8ff",
+    backgroundColor: "#071b33",
+    fontWeight: "800"
+  },
+  messageInput: {
+    minHeight: 112
+  },
+  primaryButton: {
+    minHeight: 48,
+    borderRadius: 12,
+    backgroundColor: "#149dff",
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  primaryButtonText: {
+    color: "#fff",
+    fontWeight: "900"
+  },
+  status: {
+    color: "#20f2a3",
+    backgroundColor: "rgba(32,242,163,0.1)",
+    borderWidth: 1,
+    borderColor: "rgba(32,242,163,0.28)",
+    borderRadius: 10,
+    padding: 10,
+    fontWeight: "700"
   }
 });

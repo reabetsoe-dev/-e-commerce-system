@@ -127,6 +127,10 @@ function isValidLesothoNumber(value) {
   return /^[56]\d{7}$/.test(getLesothoDigits(value));
 }
 
+function isValidEcocashNumber(value) {
+  return /^6\d{7}$/.test(getLesothoDigits(value));
+}
+
 function normalizePaymentDetails(method, rawDetails = {}, expectedAmount = 0) {
   const details = rawDetails && typeof rawDetails === "object" ? rawDetails : {};
 
@@ -140,8 +144,15 @@ function normalizePaymentDetails(method, rawDetails = {}, expectedAmount = 0) {
     const lesothoNumber = getLesothoDigits(details.lesothoNumber);
     const amount = Number(expectedAmount);
 
-    if (!isValidLesothoNumber(lesothoNumber)) {
-      return { error: "A valid Lesotho mobile number is required." };
+    const isValidMobileMoneyNumber =
+      method === "Ecocash" ? isValidEcocashNumber(lesothoNumber) : isValidLesothoNumber(lesothoNumber);
+    if (!isValidMobileMoneyNumber) {
+      return {
+        error:
+          method === "Ecocash"
+            ? "A valid EcoCash Lesotho mobile number starting with +266 6 is required."
+            : "A valid Lesotho mobile number is required."
+      };
     }
 
     if (!(amount > 0)) {

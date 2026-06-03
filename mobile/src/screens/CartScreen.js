@@ -7,79 +7,19 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View
 } from "react-native";
 import PageHeader from "../components/PageHeader";
-import api, { getApiError, resolveAssetUrl } from "../api/client";
+import { getApiError, resolveAssetUrl } from "../api/client";
 import { useCart } from "../context/CartContext";
 import { formatMoney } from "../utils/currency";
-import {
-  INVALID_NUMERIC_INPUT_MESSAGE,
-  getNumericInputError
-} from "../utils/numericValidation";
-
-const PAYMENT_METHODS = [
-  {
-    value: "Mpesa",
-    label: "Mpesa",
-    icon: require("../../assets/payments/mpesa.png")
-  },
-  {
-    value: "Ecocash",
-    label: "Ecocash",
-    icon: require("../../assets/payments/ecocash.png")
-  },
-  {
-    value: "Debit card",
-    label: "Debit card",
-    icon: require("../../assets/payments/debit-card.png")
-  }
-];
-
-const PAYMENT_NUMERIC_FIELDS = {
-  lesothoNumber: "phone",
-  cardNumber: "card",
-  cvc: "digits"
-};
-
-function isMobileMoney(method) {
-  return method === "Mpesa" || method === "Ecocash";
-}
-
-function getLesothoDigits(value) {
-  const digits = String(value || "").replace(/\D/g, "");
-  return digits.startsWith("266") ? digits.slice(3) : digits;
-}
-
-function isValidLesothoNumber(value) {
-  return /^[56]\d{7}$/.test(getLesothoDigits(value));
-}
-
-function isValidCardNumber(value) {
-  const digits = String(value || "").replace(/\D/g, "");
-  return /^\d{13,19}$/.test(digits);
-}
-
-function isValidCvc(value) {
-  return /^\d{3,4}$/.test(String(value || "").trim());
-}
 
 export default function CartScreen() {
   const navigation = useNavigation();
   const { cart, loading, refreshCart, updateItemQty, removeFromCart } = useCart();
-  const [processing, setProcessing] = useState(false);
-  const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [busyId, setBusyId] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("Mpesa");
-  const [paymentDetails, setPaymentDetails] = useState({
-    lesothoNumber: "",
-    cardNumber: "",
-    cvc: ""
-  });
   const totals = cart.summary || {};
-  const grandTotal = Number(totals.grandTotal ?? cart.total ?? 0);
 
   useFocusEffect(
     useCallback(() => {
@@ -117,91 +57,6 @@ export default function CartScreen() {
     }
   };
 
-  const checkout = async () => {
-    const paymentError = validatePayment();
-    if (paymentError) {
-      setError(paymentError);
-      return;
-    }
-
-    setProcessing(true);
-    setStatus("");
-    setError("");
-    try {
-      const { data } = await api.post("/checkout", {
-        paymentMethod,
-        paymentDetails: getPaymentDetails(),
-        shippingAddress: "Not required"
-      });
-      await refreshCart();
-      navigation.navigate("CheckoutSuccess", { order: data.order, orderId: data.order.id });
-    } catch (checkoutError) {
-      setError(getApiError(checkoutError, "Checkout failed."));
-    } finally {
-      setProcessing(false);
-    }
-  };
-
-  const updatePaymentDetail = (field, value) => {
-    const numericMode = PAYMENT_NUMERIC_FIELDS[field];
-    if (numericMode) {
-      const inputError = getNumericInputError(value, numericMode);
-      if (inputError) {
-        setError(inputError);
-        return;
-      }
-      setError((current) => (current === INVALID_NUMERIC_INPUT_MESSAGE ? "" : current));
-    }
-
-    setPaymentDetails((current) => ({ ...current, [field]: value }));
-  };
-
-  const validatePayment = () => {
-    if (isMobileMoney(paymentMethod)) {
-      const mobileMoneyInputError = getNumericInputError(paymentDetails.lesothoNumber, "phone");
-      if (mobileMoneyInputError) {
-        return INVALID_NUMERIC_INPUT_MESSAGE;
-      }
-
-      if (!isValidLesothoNumber(paymentDetails.lesothoNumber)) {
-        return "Enter a valid Lesotho mobile number, for example +266 5xxx xxxx.";
-      }
-    }
-
-    if (paymentMethod === "Debit card") {
-      const cardInputError =
-        getNumericInputError(paymentDetails.cardNumber, "card") ||
-        getNumericInputError(paymentDetails.cvc, "digits");
-      if (cardInputError) {
-        return INVALID_NUMERIC_INPUT_MESSAGE;
-      }
-
-      if (!isValidCardNumber(paymentDetails.cardNumber)) {
-        return "Enter a valid debit card number.";
-      }
-
-      if (!isValidCvc(paymentDetails.cvc)) {
-        return "Enter a valid CVC.";
-      }
-    }
-
-    return "";
-  };
-
-  const getPaymentDetails = () => {
-    if (isMobileMoney(paymentMethod)) {
-      return {
-        lesothoNumber: getLesothoDigits(paymentDetails.lesothoNumber),
-        amount: grandTotal
-      };
-    }
-
-    return {
-      cardNumber: String(paymentDetails.cardNumber || "").replace(/\D/g, ""),
-      cvc: String(paymentDetails.cvc || "").trim()
-    };
-  };
-
   if (loading) {
     return (
       <View style={styles.centered}>
@@ -215,16 +70,15 @@ export default function CartScreen() {
       <PageHeader
         title="Shopping Cart"
         subtitle="Review item quantities, verify totals, and continue to secure checkout."
-        fallback="Products"
+        fallback="Catalog"
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      {status ? <Text style={styles.status}>{status}</Text> : null}
 
       {cart.items.length === 0 ? (
         <View style={styles.emptyBox}>
           <Text style={styles.emptyText}>Your cart is empty</Text>
-          <Text style={styles.emptySub}>Add products from the Products tab to begin.</Text>
-          <Pressable style={styles.checkoutBtn} onPress={() => navigation.navigate("Products")}>
+          <Text style={styles.emptySub}>Add products from the Catalog tab to begin.</Text>
+          <Pressable style={styles.checkoutBtn} onPress={() => navigation.navigate("Catalog")}>
             <Text style={styles.checkoutBtnText}>Explore Catalog</Text>
           </Pressable>
         </View>
@@ -284,80 +138,8 @@ export default function CartScreen() {
             <SummaryLine label="Delivery" value={formatMoney(totals.deliveryFee || 0)} />
             <SummaryLine label="Grand Total" value={formatMoney(grandTotal)} total />
 
-            <Text style={styles.label}>Payment Method</Text>
-            <View style={styles.paymentRow}>
-              {PAYMENT_METHODS.map((method) => (
-                <Pressable
-                  key={method.value}
-                  style={[
-                    styles.paymentCard,
-                    paymentMethod === method.value && styles.paymentCardActive
-                  ]}
-                  onPress={() => {
-                    setError("");
-                    setPaymentMethod(method.value);
-                  }}
-                >
-                  <Image source={method.icon} style={styles.paymentIcon} resizeMode="contain" />
-                  <Text
-                    style={[
-                      styles.paymentChipText,
-                      paymentMethod === method.value && styles.paymentChipTextActive
-                    ]}
-                  >
-                    {method.label}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-
-            {isMobileMoney(paymentMethod) ? (
-              <View style={styles.paymentFields}>
-                <TextInput
-                  style={styles.paymentInput}
-                  placeholder="+266 5xxx xxxx"
-                  placeholderTextColor="#7b90a0"
-                  keyboardType="phone-pad"
-                  value={paymentDetails.lesothoNumber}
-                  onChangeText={(value) => updatePaymentDetail("lesothoNumber", value)}
-                />
-                <View style={styles.paymentTotalBox}>
-                  <Text style={styles.paymentTotalLabel}>Amount</Text>
-                  <Text style={styles.paymentTotalValue}>
-                    {formatMoney(grandTotal)}
-                  </Text>
-                </View>
-              </View>
-            ) : (
-              <View style={styles.paymentFields}>
-                <TextInput
-                  style={styles.paymentInput}
-                  placeholder="Card number"
-                  placeholderTextColor="#7b90a0"
-                  keyboardType="number-pad"
-                  value={paymentDetails.cardNumber}
-                  onChangeText={(value) => updatePaymentDetail("cardNumber", value)}
-                />
-                <TextInput
-                  style={styles.paymentInput}
-                  placeholder="CVC"
-                  placeholderTextColor="#7b90a0"
-                  keyboardType="number-pad"
-                  maxLength={4}
-                  value={paymentDetails.cvc}
-                  onChangeText={(value) => updatePaymentDetail("cvc", value)}
-                />
-              </View>
-            )}
-
-            <Pressable
-              style={[styles.checkoutBtn, processing && styles.disabledBtn]}
-              onPress={checkout}
-              disabled={processing}
-            >
-              <Text style={styles.checkoutBtnText}>
-                {processing ? "Processing..." : "Place Order"}
-              </Text>
+            <Pressable style={styles.checkoutBtn} onPress={() => navigation.navigate("Checkout")}>
+              <Text style={styles.checkoutBtnText}>Proceed to Checkout</Text>
             </Pressable>
           </View>
         </>

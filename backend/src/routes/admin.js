@@ -6,6 +6,10 @@ const router = express.Router();
 
 router.use(adminOnly);
 
+function isCypressTestUser(user) {
+  return /^cypress\.user\.\d+@example\.com$/i.test(String(user?.email || ""));
+}
+
 function getMonthlySales(orders) {
   const map = new Map();
   const now = new Date();
@@ -54,6 +58,7 @@ function getTopSellingProducts(orders, products) {
 
 router.get("/summary", async (req, res) => {
   const db = await readDb();
+  const visibleUsers = db.users.filter((user) => !isCypressTestUser(user));
   const totalRevenue = db.orders.reduce((sum, order) => sum + Number(order.total || 0), 0);
   const ordersByStatus = db.orders.reduce((acc, order) => {
     acc[order.status] = (acc[order.status] || 0) + 1;
@@ -81,7 +86,7 @@ router.get("/summary", async (req, res) => {
     }));
 
   return res.json({
-    users: db.users.length,
+    users: visibleUsers.length,
     products: db.products.length,
     orders: db.orders.length,
     totalRevenue: Number(totalRevenue.toFixed(2)),
@@ -97,6 +102,7 @@ router.get("/summary", async (req, res) => {
 router.get("/users", async (req, res) => {
   const db = await readDb();
   const users = db.users
+    .filter((user) => !isCypressTestUser(user))
     .map((user) => sanitizeUser(user))
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   return res.json({ users });

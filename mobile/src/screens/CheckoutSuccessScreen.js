@@ -37,7 +37,7 @@ export default function CheckoutSuccessScreen() {
         </Pressable>
         <Pressable
           style={styles.secondaryButton}
-          onPress={() => navigation.navigate("Tabs", { screen: "Products" })}
+          onPress={() => navigation.navigate("Tabs", { screen: "Catalog" })}
         >
           <Text style={styles.secondaryButtonText}>Continue Shopping</Text>
         </Pressable>
@@ -49,37 +49,37 @@ export default function CheckoutSuccessScreen() {
 const styles = StyleSheet.create({
   page: {
     flex: 1,
-    backgroundColor: "#f4f8fb"
+    backgroundColor: "#020817"
   },
   content: {
-    padding: 12,
+    padding: 14,
     paddingBottom: 28,
     gap: 10
   },
   card: {
     borderWidth: 1,
-    borderColor: "#d8e5e1",
+    borderColor: "rgba(0,166,255,0.24)",
     borderRadius: 16,
-    backgroundColor: "#fff",
+    backgroundColor: "#06152b",
     padding: 14,
     gap: 5
   },
   label: {
-    color: "#5f7280",
+    color: "#8ea7c4",
     fontSize: 12,
     fontWeight: "900",
     textTransform: "uppercase",
     marginTop: 6
   },
   value: {
-    color: "#163a4c",
+    color: "#edf8ff",
     fontWeight: "800"
   },
   actionRow: {
     gap: 8
   },
   primaryButton: {
-    backgroundColor: "#0644ca",
+    backgroundColor: "#149dff",
     borderRadius: 12,
     paddingVertical: 13,
     alignItems: "center"
@@ -90,14 +90,14 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     borderWidth: 1,
-    borderColor: "#c8deda",
-    backgroundColor: "#f2f8f6",
+    borderColor: "rgba(0,217,255,0.34)",
+    backgroundColor: "rgba(0,217,255,0.05)",
     borderRadius: 12,
     paddingVertical: 13,
     alignItems: "center"
   },
   secondaryButtonText: {
-    color: "#173240",
+    color: "#03d9ff",
     fontWeight: "900"
   }
 });

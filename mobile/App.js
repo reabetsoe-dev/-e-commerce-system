@@ -4,9 +4,11 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ActivityIndicator, Text, View } from "react-native";
+import HomeScreen from "./src/screens/HomeScreen";
 import AuthScreen from "./src/screens/AuthScreen";
 import ProductsScreen from "./src/screens/ProductsScreen";
 import CartScreen from "./src/screens/CartScreen";
+import CheckoutScreen from "./src/screens/CheckoutScreen";
 import OrdersScreen from "./src/screens/OrdersScreen";
 import ProfileScreen from "./src/screens/ProfileScreen";
 import ProductDetailsScreen from "./src/screens/ProductDetailsScreen";
@@ -34,7 +36,8 @@ const COLORS = {
   muted: "#8ea7c4"
 };
 const TAB_ICONS = {
-  Products: ["storefront", "storefront-outline"],
+  Home: ["home", "home-outline"],
+  Catalog: ["storefront", "storefront-outline"],
   Hosting: ["server", "server-outline"],
   Wishlist: ["heart", "heart-outline"],
   Cart: ["cart", "cart-outline"],
@@ -118,27 +121,90 @@ function AppTabs() {
         }
       })}
     >
-      <Tab.Screen name="Products" component={ProductsScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Catalog" component={ProductsScreen} />
       <Tab.Screen name="Hosting" component={HostingPlansScreen} />
       <Tab.Screen
         name="Wishlist"
-        component={WishlistScreen}
         options={{
-          tabBarBadge: wishlistIds.length > 0 ? wishlistIds.length : undefined
+          tabBarBadge: user && wishlistIds.length > 0 ? wishlistIds.length : undefined
         }}
-      />
+      >
+        {() => (
+          <ProtectedScreen>
+            <WishlistScreen />
+          </ProtectedScreen>
+        )}
+      </Tab.Screen>
       <Tab.Screen
         name="Cart"
-        component={CartScreen}
         options={{
-          tabBarBadge: cartCount > 0 ? cartCount : undefined
+          tabBarBadge: user && cartCount > 0 ? cartCount : undefined
         }}
-      />
-      <Tab.Screen name="Orders" component={OrdersScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
-      {user?.role === "admin" && <Tab.Screen name="Admin" component={AdminScreen} />}
+      >
+        {() => (
+          <ProtectedScreen>
+            <CartScreen />
+          </ProtectedScreen>
+        )}
+      </Tab.Screen>
+      <Tab.Screen name="Orders">
+        {() => (
+          <ProtectedScreen>
+            <OrdersScreen />
+          </ProtectedScreen>
+        )}
+      </Tab.Screen>
+      <Tab.Screen name="Profile">
+        {() => (
+          <ProtectedScreen>
+            <ProfileScreen />
+          </ProtectedScreen>
+        )}
+      </Tab.Screen>
+      {user?.role === "admin" && (
+        <Tab.Screen name="Admin">
+          {() => (
+            <ProtectedScreen requireAdmin>
+              <AdminScreen />
+            </ProtectedScreen>
+          )}
+        </Tab.Screen>
+      )}
     </Tab.Navigator>
   );
+}
+
+function ProtectedScreen({ children, requireAdmin = false }) {
+  const { token, user, loading } = useAuth();
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  if (!token) {
+    return <AuthScreen embedded />;
+  }
+
+  if (requireAdmin && user?.role !== "admin") {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 24,
+          backgroundColor: COLORS.bg
+        }}
+      >
+        <Text style={{ color: COLORS.text, fontSize: 18, fontWeight: "900" }}>
+          Admin access required.
+        </Text>
+      </View>
+    );
+  }
+
+  return children;
 }
 
 function AppStack() {
@@ -147,7 +213,9 @@ function AppStack() {
       <ShopProvider>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Tabs" component={AppTabs} />
+          <Stack.Screen name="Auth" component={AuthScreen} />
           <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
+          <Stack.Screen name="Checkout" component={CheckoutScreen} />
           <Stack.Screen name="CheckoutSuccess" component={CheckoutSuccessScreen} />
           <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
           <Stack.Screen name="About" component={InfoScreen} initialParams={{ type: "about" }} />
@@ -160,21 +228,13 @@ function AppStack() {
 }
 
 function RootNavigator() {
-  const { token, loading } = useAuth();
+  const { loading } = useAuth();
 
   if (loading) {
     return <LoadingScreen />;
   }
 
-  return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {!token ? (
-        <Stack.Screen name="Auth" component={AuthScreen} />
-      ) : (
-        <Stack.Screen name="Main" component={AppStack} />
-      )}
-    </Stack.Navigator>
-  );
+  return <AppStack />;
 }
 
 export default function App() {

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -35,7 +36,9 @@ function isStrongPassword(password) {
   );
 }
 
-export default function AuthScreen() {
+export default function AuthScreen({ embedded = false }) {
+  const navigation = useNavigation();
+  const route = useRoute();
   const { login, register, forgotPassword, resetPassword, getApiError } = useAuth();
   const [mode, setMode] = useState("login");
   const [form, setForm] = useState(INITIAL_FORM);
@@ -113,9 +116,11 @@ export default function AuthScreen() {
 
     try {
       if (mode === "login") {
-        await login(form.email.trim(), form.password);
+        const authenticatedUser = await login(form.email.trim(), form.password);
+        afterAuth(authenticatedUser);
       } else if (mode === "register") {
-        await register(form.name.trim(), form.email.trim(), form.password);
+        const authenticatedUser = await register(form.name.trim(), form.email.trim(), form.password);
+        afterAuth(authenticatedUser);
       } else if (mode === "forgot") {
         const data = await forgotPassword(form.email.trim());
         setStatus(
@@ -136,6 +141,16 @@ export default function AuthScreen() {
     } finally {
       setBusy(false);
     }
+  };
+
+  const afterAuth = (authenticatedUser) => {
+    if (embedded) {
+      return;
+    }
+
+    const nextScreen =
+      authenticatedUser?.role === "admin" ? "Admin" : route.params?.redirectScreen || "Home";
+    navigation.navigate("Tabs", { screen: nextScreen });
   };
 
   const title =
