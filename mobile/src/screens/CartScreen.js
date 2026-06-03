@@ -136,7 +136,7 @@ export default function CartScreen() {
             <SummaryLine label="Subtotal" value={formatMoney(totals.subtotal || cart.total)} />
             <SummaryLine label="Tax" value={formatMoney(totals.tax || 0)} />
             <SummaryLine label="Delivery" value={formatMoney(totals.deliveryFee || 0)} />
-            <SummaryLine label="Grand Total" value={formatMoney(grandTotal)} total />
+            <SummaryLine label="Grand Total" value={formatMoney(totals.grandTotal ?? cart.total ?? 0)} total />
 
             <Pressable style={styles.checkoutBtn} onPress={() => navigation.navigate("Checkout")}>
               <Text style={styles.checkoutBtnText}>Proceed to Checkout</Text>
